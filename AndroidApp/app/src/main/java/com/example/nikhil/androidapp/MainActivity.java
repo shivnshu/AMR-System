@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
                 connected = true;
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 while (connected) {
-                    out.printf("%10.2f\n", x);
+                    out.printf("%10.2f\n", z);
                     //Log.d(TAG, "a");
                     out.flush();
                     Thread.sleep(7);

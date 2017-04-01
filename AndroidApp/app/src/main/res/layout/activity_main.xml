@@ -8,14 +8,6 @@
     tools:context="com.example.nikhil.androidapp.MainActivity">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:autoLink="web"
-        android:text="http://android-er.blogspot.com/"
-        android:textStyle="bold" />
-
-    <TextView
         android:id="@+id/infoip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,13 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 ##server.py
 import socket
 from time import sleep 
 import sys 
 
-
 serv=socket.socket()
 
-HOST='192.168.12.231'
+HOST='0.0.0.0'
 #HOST="78.91.80.123"
 PORT = 8080   #arbitrary port not currently in use
 #ADDR = (HOST,PORT)    #we need a tuple for the address
@@ -24,7 +23,7 @@ except KeyboardInterrupt:
 	exit(1)
 try:
 	for i in range(0,3100):
-		data=conn.recv(4096)
+		data=conn.recv(BUFSIZE)
 		sys.stdout.flush()
 		chunk=data.split()
 		sys.stdout.write("0:%s\n" % chunk[-1]) # writes the last element in the list

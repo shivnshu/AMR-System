@@ -37,6 +37,7 @@ import java.util.Enumeration;
 
 
         private float x, y, z;
+        private float x_g, y_g, z_g;
         TextView infoIp, infoPort;
         TextView textViewState, textViewPrompt;
 
@@ -146,7 +147,7 @@ import java.util.Enumeration;
 
                         // receive request
                         DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                        Log.d(TAG, "waiting for connection");
+                        Log.d(TAG, "waiting for connection at" + port);
                         socket.receive(packet);     //this code block the program flow
                         Log.d(TAG, "Got connection");
                         // send the response to the client at "address" and "port"
@@ -154,12 +155,14 @@ import java.util.Enumeration;
                         int port = packet.getPort();
 
                         updateState("Request from: " + address + ":" + port + "\n");
-
-                        String dString = new Date().toString() + "\n"
-                                + "Your address " + address.toString() + ":" + String.valueOf(port);
-                        buf = dString.getBytes();
-                        packet = new DatagramPacket(buf, buf.length, address, port);
-                        socket.send(packet);
+                        String s;
+                        while(true){
+                            s = Float.toString(x_g) + "\t" + Float.toString(y_g) + "\t" + Float.toString(z_g) + "\n";
+                            buf = s.getBytes();
+                            packet = new DatagramPacket(buf, buf.length, address, port);
+                            socket.send(packet);
+                            //Thread.sleep(8);
+                        }
 
                     }
 
@@ -255,10 +258,13 @@ import java.util.Enumeration;
             @Override
             public void onSensorChanged(SensorEvent event) {
 
+                x_g = event.values[0];
+                y_g = event.values[1];
+                z_g = event.values[2];
 
-                GX.setText( "g_x:"+Float.toString(event.values[0]));
-                GY.setText( "g_y:"+Float.toString(event.values[1]));
-                GZ.setText( "g_z:"+Float.toString(event.values[2]));
+                GX.setText( "g_x:"+Float.toString(x_g));
+                GY.setText( "g_y:"+Float.toString(y_g));
+                GZ.setText( "g_z:"+Float.toString(y_g));
 
             }
         };

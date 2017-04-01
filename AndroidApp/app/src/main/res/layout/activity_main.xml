@@ -1,64 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+    tools:context="com.example.nikhil.androidapp.MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:autoLink="web"
+        android:text="http://android-er.blogspot.com/"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/infoip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/infoport"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="un-initiated"
+        android:textSize="20dp"/>
+
+    <TextView
+        android:id="@+id/prompt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="PORT"
+        android:ems="10"
+        android:id="@+id/_port" />
 
     <Button
-        android:id="@+id/send"
-        android:layout_width="fill_parent"
+        android:text="START SERVER"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send"
-        />
+        android:id="@+id/_start_server" />
+
     <TextView
-        android:id="@+id/textin"
-        android:layout_width="fill_parent"
+        android:text="ax"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:id="@+id/_ax" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
+    <TextView
+        android:text="ay"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        >
-        <TextView
-            android:id="@+id/portnr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Port: "
-            />
-        <EditText
-            android:id="@+id/port"
-            android:width="400px"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="New Port Number ex: 1115"
-            android:inputType="number"
-            android:selectAllOnFocus="true"
-            />
-    </LinearLayout>
+        android:id="@+id/_ay" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
+    <TextView
+        android:text="az"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        >
-        <TextView
-            android:id="@+id/ipadd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="IP-adress: "
-            />
+        android:id="@+id/_az" />
 
-        <EditText
-            android:id="@+id/ipadr"
-            android:width="400px"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:hint="new_ip. Ex : 192.44.34.1"
-            android:selectAllOnFocus="true"
-            />
-    </LinearLayout>
+    <TextView
+        android:text="gx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/_gx" />
+
+    <TextView
+        android:text="gy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/_gy" />
+
+    <TextView
+        android:text="gz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/_gz" />
 </LinearLayout>
-

@@ -1,30 +1,30 @@
 package com.example.nikhil.androidapp;
 
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
 
+import android.app.Activity;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
-        import java.io.BufferedWriter;
-        import java.io.OutputStreamWriter;
-        import java.io.PrintWriter;
-        import java.net.InetAddress;
-        import java.net.Socket;
-
-        import android.app.Activity;
-        import android.content.Context;
-        import android.hardware.Sensor;
-        import android.hardware.SensorEvent;
-        import android.hardware.SensorEventListener;
-        import android.hardware.SensorManager;
-        import android.os.Bundle;
-        import android.view.View;
-        import android.widget.Button;
-        import android.widget.EditText;
-        import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
     public int PORT = 8080;
     private Button connectPhones;
-    private String serverIpAddress = "0.0.0.0";
+    private String serverIpAddress = "192.168.12.231";
     private boolean connected = false;
     TextView text;
     EditText port;
@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     boolean acc_disp = false;
     boolean isStreaming = false;
     PrintWriter out;
+    private static final String TAG = "MainActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class MainActivity extends Activity {
                 out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
                 while (connected) {
                     out.printf("%10.2f\n", x);
+                    //Log.d(TAG, "a");
                     out.flush();
                     Thread.sleep(7);
                 }

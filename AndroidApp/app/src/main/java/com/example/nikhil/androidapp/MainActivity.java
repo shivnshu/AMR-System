@@ -36,11 +36,11 @@ public class MainActivity extends Activity {
         boolean acc_disp = false;
         private boolean connected = false;
         private float x, y, z;
-        private float x_g, y_g, z_g;
+        private float x_g, y_g, z_g,w_g;
         TextView infoIp, infoPort;
         TextView textViewState, textViewPrompt;
         EditText port;
-        TextView AX, AY,AZ, GX,GY,GZ;
+        TextView AX, AY,AZ, GX,GY,GZ,GW;
         Button button;
         //static final int UdpServerPORT = 5000;
         static int UdpServerPORT = 5000;
@@ -72,7 +72,7 @@ public class MainActivity extends Activity {
             GX = (TextView) findViewById(R.id._gx);
             GY = (TextView) findViewById(R.id._gy);
             GZ = (TextView) findViewById(R.id._gz);
-
+            GW = (TextView) findViewById(R.id._gw);
             button = (Button) findViewById(R.id._start_server);
             button.setOnClickListener(connectListener);
             button.setText("Start/Stop Server");
@@ -182,7 +182,7 @@ public class MainActivity extends Activity {
                         updateState("Request from: " + address + ":" + port + "\n");
                         String s;
                         while(true && running){
-                            s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + "\n";
+                            s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + " " + Float.toString(w_g) + "\n";
                             buf = s.getBytes();
                             packet = new DatagramPacket(buf, buf.length, address, port);
                             socket.send(packet);
@@ -249,9 +249,9 @@ public class MainActivity extends Activity {
         protected void onResume() {
             super.onResume();
             sensorManager.registerListener(accelerationListener, sensor,
-                    SensorManager.SENSOR_DELAY_FASTEST);
+                    sensorManager.SENSOR_DELAY_NORMAL);
             sensorManager.registerListener(gyroListener, sensor_gyro,
-                    SensorManager.SENSOR_DELAY_FASTEST);
+                    sensorManager.SENSOR_DELAY_FASTEST);
         }
 
         @Override
@@ -289,10 +289,11 @@ public class MainActivity extends Activity {
                 x_g = event.values[0];
                 y_g = event.values[1];
                 z_g = event.values[2];
-
+                w_g = event.values[3];
                 GX.setText( "g_x:"+Float.toString(x_g));
                 GY.setText( "g_y:"+Float.toString(y_g));
-                GZ.setText( "g_z:"+Float.toString(y_g));
+                GZ.setText( "g_z:"+Float.toString(z_g));
+                GW.setText( "g_w:"+Float.toString(w_g));
 
             }
         };

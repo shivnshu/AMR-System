@@ -104,4 +104,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/_gz"
         android:background="@android:drawable/alert_light_frame" />
+
+    <TextView
+        android:text="gw"
+        android:layout_width="210dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/_gw"
+        android:background="@android:drawable/alert_light_frame" />
 </LinearLayout>

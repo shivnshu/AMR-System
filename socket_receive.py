@@ -11,5 +11,9 @@ msg = 'c'
 sock.sendto(msg, server_address)
 
 while True:
-	data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
-	print "received message:", data
+        data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+        arr =  data.split()
+        x = round(float(arr[0]), 2)
+        y = round(float(arr[1]), 2)
+        z = round(float(arr[2]), 2)
+        print "x: %.2f, y: %.2f, z: %.2f\n" % (x, y, z)

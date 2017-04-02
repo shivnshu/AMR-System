@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:orientation="vertical"
-    tools:context="com.example.nikhil.androidapp.MainActivity">
+    tools:context="com.example.nikhil.androidapp.MainActivity"
+    android:weightSum="1">
 
     <TextView
         android:id="@+id/infoip"
@@ -24,7 +25,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="un-initiated"
-        android:textSize="20dp"/>
+        android:textSize="20dp"
+        android:textAlignment="center" />
 
     <TextView
         android:id="@+id/prompt"
@@ -38,47 +40,68 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/_port"
-        android:hint="PORT" />
+        android:hint="PORT"
+        android:typeface="normal"
+        android:textAllCaps="false"
+        android:textAlignment="viewStart"
+        android:singleLine="false"
+        android:selectAllOnFocus="false"
+        android:background="@android:drawable/editbox_dropdown_light_frame"
+        android:fontFamily="sans-serif"
+        android:textSize="18sp"
+        android:layout_weight="0.13" />
 
     <Button
         android:text="START SERVER"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/_start_server" />
+        android:id="@+id/_start_server"
+        android:elevation="12dp"
+        tools:elevation="5dp"
+        style="@style/Widget.AppCompat.Button"
+        android:textSize="14sp"
+        android:textColor="@android:color/background_dark"
+        android:background="@android:drawable/btn_default" />
 
     <TextView
         android:text="ax"
-        android:layout_width="wrap_content"
+        android:layout_width="213dp"
         android:layout_height="wrap_content"
-        android:id="@+id/_ax" />
+        android:id="@+id/_ax"
+        android:background="@android:drawable/alert_light_frame" />
 
     <TextView
         android:text="ay"
-        android:layout_width="wrap_content"
+        android:layout_width="210dp"
         android:layout_height="wrap_content"
-        android:id="@+id/_ay" />
+        android:id="@+id/_ay"
+        android:background="@android:drawable/alert_light_frame" />
 
     <TextView
         android:text="az"
-        android:layout_width="wrap_content"
+        android:layout_width="209dp"
         android:layout_height="wrap_content"
-        android:id="@+id/_az" />
+        android:id="@+id/_az"
+        android:background="@android:drawable/alert_light_frame" />
 
     <TextView
         android:text="gx"
-        android:layout_width="wrap_content"
+        android:layout_width="208dp"
         android:layout_height="wrap_content"
-        android:id="@+id/_gx" />
+        android:id="@+id/_gx"
+        android:background="@android:drawable/alert_light_frame" />
 
     <TextView
         android:text="gy"
-        android:layout_width="wrap_content"
+        android:layout_width="206dp"
         android:layout_height="wrap_content"
-        android:id="@+id/_gy" />
+        android:id="@+id/_gy"
+        android:background="@android:drawable/alert_light_frame" />
 
     <TextView
         android:text="gz"
-        android:layout_width="wrap_content"
+        android:layout_width="207dp"
         android:layout_height="wrap_content"
-        android:id="@+id/_gz" />
+        android:id="@+id/_gz"
+        android:background="@android:drawable/alert_light_frame" />
 </LinearLayout>

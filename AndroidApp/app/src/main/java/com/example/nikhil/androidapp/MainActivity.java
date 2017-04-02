@@ -182,7 +182,7 @@ public class MainActivity extends Activity {
                         updateState("Request from: " + address + ":" + port + "\n");
                         String s;
                         while(true && running){
-                            s = Float.toString(x_g) + "\t" + Float.toString(y_g) + "\t" + Float.toString(z_g) + "\n";
+                            s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + "\n";
                             buf = s.getBytes();
                             packet = new DatagramPacket(buf, buf.length, address, port);
                             socket.send(packet);

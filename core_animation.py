@@ -47,6 +47,8 @@ def rotating_cube_1_axis(event=None):
     msg = 'c'
     sock.sendto(msg, server_address)
     c = 0
+    zoomIn_old = 0
+    zoomOut_old = 0
     ais_boxshp = build_shape()
     while True:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 byte
@@ -55,9 +57,17 @@ def rotating_cube_1_axis(event=None):
         y = round(float(arr[1]), 2)
         z = round(float(arr[2]), 2)
         w = round(float(arr[3]), 2)
+        zoomIn = int(arr[4])
+        zoomOut = int(arr[5])
         c = c + 1
         if c==10:
             # display.EraseAll()
+            if(zoomIn != zoomIn_old):
+                display.ZoomFactor(1.1)
+                zoomIn_old = zoomIn
+            if(zoomOut != zoomOut_old):
+                display.ZoomFactor(0.9)
+                zoomOut_old = zoomOut
             ax1 = gp_Ax1(gp_Pnt(25., 25., 25.), gp_Dir(x, y, z))
             aCubeTrsf = gp_Trsf()
             angle = 2*math.acos(w) 

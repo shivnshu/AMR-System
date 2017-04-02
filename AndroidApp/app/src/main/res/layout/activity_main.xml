@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -7,9 +8,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:orientation="vertical"
     tools:context="com.example.nikhil.androidapp.MainActivity"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:orientation="vertical"
+    android:background="#81c7a1"
+    >
 
     <TextView
         android:id="@+id/infoip"
@@ -39,20 +42,21 @@
 
     <EditText
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:inputType="number"
         android:ems="10"
         android:id="@+id/_port"
         android:hint="PORT"
         android:typeface="normal"
         android:textAllCaps="false"
-        android:textAlignment="viewStart"
+        android:textAlignment="center"
         android:singleLine="false"
         android:selectAllOnFocus="false"
         android:background="@android:drawable/editbox_dropdown_light_frame"
         android:fontFamily="sans-serif"
         android:textSize="18sp"
-        android:layout_weight="0.13" />
+        android:layout_weight="0.31"
+        android:textColorLink="?attr/actionModeSplitBackground" />
 
     <Button
         android:text="START SERVER"
@@ -64,69 +68,96 @@
         style="@style/Widget.AppCompat.Button"
         android:textSize="14sp"
         android:textColor="@android:color/background_dark"
-        android:background="@android:drawable/btn_default" />
-
-    <TextView
-        android:text="ax"
-        android:layout_width="203dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/_ax"
-        android:background="@android:drawable/alert_light_frame" />
-
-    <TextView
-        android:text="ay"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/_ay"
-        android:background="@android:drawable/alert_light_frame" />
-
-    <TextView
-        android:text="az"
-        android:layout_width="199dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/_az"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/btn_default_small" />
 
     <TextView
         android:text="gx"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/_gx"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/alert_light_frame"
+        android:width="?attr/actionBarSize"
+        android:textAlignment="center"
+        android:textColor="?attr/actionMenuTextColor" />
 
     <TextView
         android:text="gy"
-        android:layout_width="198dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/_gy"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="?attr/actionMenuTextColor" />
 
     <TextView
         android:text="gz"
-        android:layout_width="197dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/_gz"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="?attr/actionMenuTextColor" />
 
     <TextView
         android:text="gw"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/_gw"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="?attr/actionMenuTextColor" />
 
     <TextView
         android:text="ScaleUp"
-        android:layout_width="206dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/_scaleup"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="@android:color/darker_gray" />
 
     <TextView
         android:text="ScaleDown"
-        android:layout_width="206dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:id="@+id/_scaledown"
-        android:background="@android:drawable/alert_light_frame" />
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="@android:color/darker_gray" />
+
+    <TextView
+        android:text="ax"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/_ax"
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_dark" />
+
+    <TextView
+        android:text="ay"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/_ay"
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_dark" />
+
+    <TextView
+        android:text="az"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/_az"
+        android:background="@android:drawable/alert_light_frame"
+        android:textColorLink="?attr/actionModeSplitBackground"
+        android:textAlignment="center"
+        android:textColor="@android:color/background_dark" />
 </LinearLayout>
     </ScrollView>

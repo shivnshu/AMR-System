@@ -1,0 +1,67 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fef65b"
+    tools:context="com.example.nikhil.androidapp.StartActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+    <TextView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="fill_vertical|center_horizontal|center"
+        android:keepScreenOn="true"
+        android:text=" CAD \n RENDERING CONTROLLER"
+        android:textColor="#7b7b7b"
+        android:textSize="50sp"
+        android:fontFamily="casual"
+        android:textStyle="normal|bold"
+        android:textAllCaps="true" />
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
+            android:id="@+id/fullscreen_content_controls"
+            style="?metaButtonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:background="@color/black_overlay"
+            android:orientation="horizontal"
+            tools:ignore="UselessParent">
+
+            <Button
+                android:id="@+id/dummy_button"
+                style="@style/Widget.AppCompat.Button"
+                android:layout_width="match_parent"
+                android:layout_height="66dp"
+                android:text="START CONTROLLER"
+                android:elevation="5dp"
+                android:visibility="visible"
+                android:background="@android:drawable/alert_dark_frame"
+                android:textSize="18sp"
+                android:textColor="?android:attr/colorBackground" />
+
+        </LinearLayout>
+
+        <TextView
+            android:text="AMR"
+            android:layout_width="match_parent"
+            android:layout_height="79dp"
+            android:id="@+id/textView"
+            android:fontFamily="casual"
+            android:textStyle="normal|bold"
+            android:textSize="45sp"
+            android:textColor="#42404a"
+            android:textAlignment="center" />
+    </FrameLayout>
+
+</FrameLayout>

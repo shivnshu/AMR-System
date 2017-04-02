@@ -57,6 +57,7 @@ public class MainActivity extends Activity {
 
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
+            this.setTitle("CAD RENDERING CONTROLLER");
 
             infoIp = (TextView) findViewById(R.id.infoip);
             infoPort = (TextView) findViewById(R.id.infoport);

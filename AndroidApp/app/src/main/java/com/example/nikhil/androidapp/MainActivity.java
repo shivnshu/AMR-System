@@ -62,14 +62,7 @@ public class MainActivity extends Activity {
             textViewPrompt = (TextView) findViewById(R.id.prompt);
 
             port = (EditText) findViewById(R.id._port);
-            try
-            {
-                 UdpServerPORT = Integer.parseInt(port.getText().toString());
-            }
-            catch (NumberFormatException e)
-            {
-                // handle the exception
-            }
+            port.setText(String.valueOf(UdpServerPORT));
             //final String Port = port.getText().toString().trim();
             //UdpServerPORT = Integer.parseInt(port.getText().toString().trim());
 
@@ -89,7 +82,7 @@ public class MainActivity extends Activity {
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE).get(0);
+            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
             acc_disp = false;
             updateState("UDP Server is not running");
         }

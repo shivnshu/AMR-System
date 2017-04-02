@@ -2,6 +2,8 @@ package com.example.nikhil.androidapp;
 
 import java.net.InetAddress;
 
+
+import java.lang.Object;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -22,40 +24,54 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
-    public class MainActivity extends Activity {
+public class MainActivity extends Activity {
         private final static String TAG = MainActivity.class.getSimpleName();
 
         private SensorManager sensorManager;
         private Sensor sensor,sensor_gyro;
         boolean acc_disp = false;
-        EditText port;
-        TextView AX, AY,AZ, GX,GY,GZ;
-        Button button;
         private boolean connected = false;
-
-
         private float x, y, z;
         private float x_g, y_g, z_g;
         TextView infoIp, infoPort;
         TextView textViewState, textViewPrompt;
-
-        static final int UdpServerPORT = 5000;
+        EditText port;
+        TextView AX, AY,AZ, GX,GY,GZ;
+        Button button;
+        //static final int UdpServerPORT = 5000;
+        static int UdpServerPORT = 5000;
         UdpServerThread udpServerThread;
         DatagramSocket socket;
 
+
+
+        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // main // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
         @Override
         protected void onCreate(Bundle savedInstanceState) {
+
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
+
             infoIp = (TextView) findViewById(R.id.infoip);
             infoPort = (TextView) findViewById(R.id.infoport);
             textViewState = (TextView) findViewById(R.id.state);
             textViewPrompt = (TextView) findViewById(R.id.prompt);
 
             port = (EditText) findViewById(R.id._port);
+            try
+            {
+                 UdpServerPORT = Integer.parseInt(port.getText().toString());
+            }
+            catch (NumberFormatException e)
+            {
+                // handle the exception
+            }
             //final String Port = port.getText().toString().trim();
+            //UdpServerPORT = Integer.parseInt(port.getText().toString().trim());
 
             AX = (TextView) findViewById(R.id._ax);
             AY = (TextView) findViewById(R.id._ay);
@@ -63,36 +79,54 @@ import java.util.Enumeration;
             GX = (TextView) findViewById(R.id._gx);
             GY = (TextView) findViewById(R.id._gy);
             GZ = (TextView) findViewById(R.id._gz);
+
             button = (Button) findViewById(R.id._start_server);
             button.setOnClickListener(connectListener);
+            button.setText("Start/Stop Server");
 
             infoIp.setText(getIpAddress());
             infoPort.setText(String.valueOf(UdpServerPORT));
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
+            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_GYROSCOPE).get(0);
             acc_disp = false;
             updateState("UDP Server is not running");
         }
+        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
 
+        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // UDP Server // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
         private Button.OnClickListener connectListener = new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try
+                {
+                    UdpServerPORT = Integer.parseInt(port.getText().toString());
+                }
+                catch (NumberFormatException e)
+                {
+                    // handle the exception
+                }
                 if (!connected) {
 
-                    button.setText("Stop");
+                    //button.setText("Stop");
+                    infoPort.setText(String.valueOf(UdpServerPORT));
                     connected = true;
                     udpServerThread = new UdpServerThread(UdpServerPORT);
                     udpServerThread.start();
                 }
                 else{
-                    button.setText("Start Server");
+                    //button.setText("Start Server");
                     udpServerThread.setRunning(false);
                     updateState("UDP Server is not running");
                     connected=false;
                     acc_disp=false;
-                    //socket.close();
+
+                    if(!socket.isClosed()) {
+                           socket.close();
+                           Log.d(TAG, "socket.close()");
+                    }
+                    //socke10t.close();
                 }
             }
         };
@@ -118,8 +152,6 @@ import java.util.Enumeration;
         private class UdpServerThread extends Thread {
 
             int serverPort;
-
-
             boolean running;
 
             public UdpServerThread(int serverPort) {
@@ -156,7 +188,7 @@ import java.util.Enumeration;
 
                         updateState("Request from: " + address + ":" + port + "\n");
                         String s;
-                        while(true){
+                        while(true && running){
                             s = Float.toString(x_g) + "\t" + Float.toString(y_g) + "\t" + Float.toString(z_g) + "\n";
                             buf = s.getBytes();
                             packet = new DatagramPacket(buf, buf.length, address, port);
@@ -174,8 +206,10 @@ import java.util.Enumeration;
                     e.printStackTrace();
                 } finally {
                     if (socket != null) {
+
                         socket.close();
-                        Log.e(TAG, "socket.close()");
+                        Log.d(TAG, "socket.close()");
+
                     }
                 }
             }
@@ -211,6 +245,7 @@ import java.util.Enumeration;
 
             return ip;
         }
+        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
 
         // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // accelerometer classes // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
         private void init_perif() {
@@ -268,5 +303,5 @@ import java.util.Enumeration;
 
             }
         };
-
+        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
     }

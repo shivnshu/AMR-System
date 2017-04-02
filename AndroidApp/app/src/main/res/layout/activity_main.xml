@@ -35,10 +35,10 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:text="PORT"
+        android:inputType="number"
         android:ems="10"
-        android:id="@+id/_port" />
+        android:id="@+id/_port"
+        android:hint="PORT" />
 
     <Button
         android:text="START SERVER"

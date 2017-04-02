@@ -41,12 +41,11 @@ public class MainActivity extends Activity {
         TextView infoIp, infoPort;
         TextView textViewState, textViewPrompt;
         EditText port;
-        TextView AX, AY,AZ, GX,GY,GZ,GW;
+        TextView AX, AY,AZ, GX,GY,GZ,GW,SCALEUP,SCALEDOWN;
         Button button;
         //static final int UdpServerPORT = 5000;
         static int UdpServerPORT = 5000;
-        static int ScaleUp,ScaleDown;
-
+        static int ScaleUp = 0, ScaleDown = 0;
         UdpServerThread udpServerThread;
         DatagramSocket socket;
 
@@ -76,6 +75,8 @@ public class MainActivity extends Activity {
             GY = (TextView) findViewById(R.id._gy);
             GZ = (TextView) findViewById(R.id._gz);
             GW = (TextView) findViewById(R.id._gw);
+            SCALEUP = (TextView) findViewById(R.id._scaleup);
+            SCALEDOWN = (TextView) findViewById(R.id._scaledown);
             button = (Button) findViewById(R.id._start_server);
             button.setOnClickListener(connectListener);
             button.setText("Start/Stop Server");
@@ -91,13 +92,14 @@ public class MainActivity extends Activity {
         // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            ScaleUp = 1;    ScaleDown = 0;
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            if(ScaleUp ==1) ScaleUp =0;
+            else if(ScaleUp==0) ScaleUp=1;
             return true;
         }
-        else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            ScaleUp = 0;    ScaleDown = 1;
-            return true;
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            if(ScaleDown ==1) ScaleDown =0;
+            else if(ScaleDown==0) ScaleDown=1;            return true;
         }
 
         else {
@@ -291,8 +293,11 @@ public class MainActivity extends Activity {
                 z = event.values[2];
                 //refreshDisplay();
                 AX.setText( "a_x:"+Float.toString(x));
-                AY.setText( "a_y:"+Float.toString(ScaleUp));
-                AZ.setText( "a_z:"+Float.toString(ScaleDown));
+                AY.setText( "a_y:"+Float.toString(y));
+                AZ.setText( "a_z:"+Float.toString(z));
+                SCALEUP.setText("Scale UP:"+Integer.toString(ScaleUp));
+                SCALEDOWN.setText("Scale DOWN:"+Integer.toString(ScaleDown));
+
 
             }
         };

@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
+import android.view.KeyEvent;
 
 
 public class MainActivity extends Activity {
@@ -44,6 +45,8 @@ public class MainActivity extends Activity {
         Button button;
         //static final int UdpServerPORT = 5000;
         static int UdpServerPORT = 5000;
+        static int ScaleUp,ScaleDown;
+
         UdpServerThread udpServerThread;
         DatagramSocket socket;
 
@@ -76,7 +79,6 @@ public class MainActivity extends Activity {
             button = (Button) findViewById(R.id._start_server);
             button.setOnClickListener(connectListener);
             button.setText("Start/Stop Server");
-
             infoIp.setText(getIpAddress());
             infoPort.setText(String.valueOf(UdpServerPORT));
 
@@ -88,6 +90,21 @@ public class MainActivity extends Activity {
         }
         // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
 
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            ScaleUp = 1;    ScaleDown = 0;
+            return true;
+        }
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            ScaleUp = 0;    ScaleDown = 1;
+            return true;
+        }
+
+        else {
+            ScaleUp = 0;    ScaleDown = 0;
+            return super.onKeyDown(keyCode, event);
+        }
+    }
         // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // UDP Server // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
         private Button.OnClickListener connectListener = new Button.OnClickListener() {
             @Override
@@ -182,11 +199,13 @@ public class MainActivity extends Activity {
                         updateState("Request from: " + address + ":" + port + "\n");
                         String s;
                         while(true && running){
-                            s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + " " + Float.toString(w_g) + "\n";
+                            Log.d(TAG, Integer.toString(ScaleUp)+Integer.toString(ScaleDown)+"\n");
+                            s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + " " + Float.toString(w_g) + " " + Integer.toString(ScaleUp) + " " + Integer.toString(ScaleDown) + "\n";
                             buf = s.getBytes();
                             packet = new DatagramPacket(buf, buf.length, address, port);
                             socket.send(packet);
                             //Thread.sleep(8);
+
                         }
 
                     }
@@ -272,8 +291,8 @@ public class MainActivity extends Activity {
                 z = event.values[2];
                 //refreshDisplay();
                 AX.setText( "a_x:"+Float.toString(x));
-                AY.setText( "a_y:"+Float.toString(y));
-                AZ.setText( "a_z:"+Float.toString(z));
+                AY.setText( "a_y:"+Float.toString(ScaleUp));
+                AZ.setText( "a_z:"+Float.toString(ScaleDown));
 
             }
         };

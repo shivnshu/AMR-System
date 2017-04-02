@@ -1,0 +1,14 @@
+1. Build a server on the mobile which broadcasts sensor data.
+2. Stop the server whenever no client is connected to conserve battery.
+3. Use UDP protocol to broadcast data on the LAN, clients can connect and receive the data.
+4. Check whether broadcasting the message will be better.
+5. Run the udp server broadcasting code in a loop in a seperate thread.
+6. Calibration of the data, fusing of gyroscope and magnetometer data.
+7. Open connection on a particular UDP port.
+
+
+TODO:
+
+1. Read sensor data on the device.
+2. Transmit the UDP packets.
+3. 

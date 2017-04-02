@@ -1,0 +1,50 @@
+﻿# change the version numer to "0.17.1" or "0.18" in cas of a release build
+package:
+  name: pythonocc-core
+  version: 0.17.2
+
+source:
+  fn: 0.17.2.tar.gz
+  url: https://github.com/tpaviot/pythonocc-core/archive/0.17.2.tar.gz
+  patches:
+    - fix_graphicshr_location.patch [win]
+    - fix_GeomFill_BSplineCurves_Init_method.patch
+
+build:
+  script_env:
+    - CC
+    - CXX
+
+  number: 1
+  binary_relocation: false [osx]
+  features:
+    - vc9               [win and py27]
+    - vc10              [win and py34]
+    - vc14              [win and py35]
+
+requirements:
+  build:
+    - patch             [win]
+    - python
+    - oce ==0.17.2
+    - cmake
+    - ninja             [win]
+    - swig
+    - freetype
+
+  run:
+    - pyqt
+    - wxpython          [py27]
+    - pyside            [py27]
+    - oce ==0.17.2
+    - python
+    - freetype
+    - pyobjc-core       [osx and py27]
+
+test:
+  requires:
+    - scipy
+about:
+  home: https://github.com/tpaviot/pythonocc-core
+  license: LGPL
+  summary: An industrial strength 3D CAD python package

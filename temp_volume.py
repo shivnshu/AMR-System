@@ -54,7 +54,7 @@ def start_animation(event=None):
             if(zoomOut != zoomOut_old):
                 display.ZoomFactor(0.9)
                 zoomOut_old = zoomOut
-            ax1 = gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(x, y, z))           
+            ax1 = gp_Ax1(gp_Pnt(10., 10., 10.), gp_Dir(x, y, z))           
             aCubeTrsf = gp_Trsf()                                          
             angle = 2*math.acos(w)                                         
             aCubeTrsf.SetRotation(ax1, angle)                              

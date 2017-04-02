@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import time
 import socket
+import math
 from math import pi
 
 from OCC.gp import gp_Ax1, gp_Pnt, gp_Dir, gp_Trsf
@@ -53,12 +54,13 @@ def rotating_cube_1_axis(event=None):
         x = round(float(arr[0]), 2)
         y = round(float(arr[1]), 2)
         z = round(float(arr[2]), 2)
+        w = round(float(arr[3]), 2)
         c = c + 1
         if c==10:
             # display.EraseAll()
-            ax1 = gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(x, y, z))
+            ax1 = gp_Ax1(gp_Pnt(25., 25., 25.), gp_Dir(x, y, z))
             aCubeTrsf = gp_Trsf()
-            angle = 2.0
+            angle = 2*math.acos(w) 
             aCubeTrsf.SetRotation(ax1, angle)
             aCubeToploc = TopLoc_Location(aCubeTrsf)
             display.Context.SetLocation(ais_boxshp, aCubeToploc)

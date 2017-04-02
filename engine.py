@@ -42,7 +42,7 @@ def start_animation(event=None):
         z = round(float(arr[2]), 2)                                        
         w = round(float(arr[3]), 2) 
         c = c + 1                                                          
-        if c==10:                                                          
+        if c==100:                                                          
             ax1 = gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(x, y, z))           
             aCubeTrsf = gp_Trsf()                                          
             angle = 2*math.acos(w)                                         

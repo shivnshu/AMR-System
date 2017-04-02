@@ -46,7 +46,7 @@ def start_animation(event=None):
         zoomIn = int(arr[4])
         zoomOut = int(arr[5])
         c = c + 1                                                          
-        if c==10:                                                          
+        if c==100:                                                          
 #            display.ZoomFactor(2)
             if(zoomIn != zoomIn_old):
                 display.ZoomFactor(1.1)

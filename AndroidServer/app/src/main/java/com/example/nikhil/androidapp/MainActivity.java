@@ -34,8 +34,6 @@ public class MainActivity extends Activity {
 
         private SensorManager sensorManager;
         private Sensor sensor,sensor_gyro;
-        boolean acc_disp = false;
-        private boolean connected = false;
         private float x, y, z;
         private float x_g, y_g, z_g,w_g;
         TextView infoIp, infoPort;
@@ -51,7 +49,7 @@ public class MainActivity extends Activity {
         udpSenderThread udpSendThread;
         DatagramSocket receiveSocket;
         DatagramSocket sendSocket;
-        boolean running;
+        boolean running = false;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -84,9 +82,9 @@ public class MainActivity extends Activity {
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            acc_disp = false;
+            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
             updateState("UDP Server is not running");
+            Log.d(TAG, "TAG string is " + TAG + "\n");
         }
 
 
@@ -118,25 +116,26 @@ public class MainActivity extends Activity {
                 }
                 catch (NumberFormatException e)
                 {
-                    // handle the exception
+                    e.printStackTrace();
                 }
-                if (!connected) {
+                if (!running) {
                     infoPort.setText(String.valueOf(udpReceiverPort));
-                    connected = true;
+                    running = true;
                     udpReceiveThread = new udpReceiverThread(udpReceiverPort);
                     udpReceiveThread.start();
                 }
                 else{
-                    udpReceiveThread.setRunning(false);
+                    running = false;
                     updateState("UDP Server is not running");
-                    connected=false;
-                    acc_disp=false;
 
                     if(!receiveSocket.isClosed()) {
                            receiveSocket.close();
-                           Log.d(TAG, "socket.close()");
+                           Log.d(TAG, "receiveSocket is closed\n");
                     }
-                    //socket.close();
+                    if(!sendSocket.isClosed()) {
+                        sendSocket.close();
+                        Log.d(TAG, "sendSocket is closed\n");
+                    }
                 }
             }
         };
@@ -159,20 +158,14 @@ public class MainActivity extends Activity {
             this.serverPort = serverPort;
         }
 
-        private void setRunning(boolean running) {
-
-            }
-
         @Override
         public void run() {
-
-            running = true;
 
             try {
                 receiveSocket = new DatagramSocket(serverPort);
 
                 updateState("UDP Server is running");
-                Log.d(TAG, "UDP Server is running");
+                Log.d(TAG, "UDP Server is running\n");
 
                 while (running) {
                     byte[] buf = new byte[256];
@@ -180,7 +173,7 @@ public class MainActivity extends Activity {
                     // receive request
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     Log.d(TAG, "waiting for connection at" + port+"\n");
-                    receiveSocket.receive(packet);     //this code block the program flow
+                    receiveSocket.receive(packet);     // this code blocks the program flow
                     Log.d(TAG, "Got connection\n");
                     // send the response to the client at "address" and "port"
                     InetAddress address = packet.getAddress();
@@ -191,14 +184,14 @@ public class MainActivity extends Activity {
                     udpSendThread.run();
                 }
 
-                Log.e(TAG, "UDP Server ended");
+                Log.e(TAG, "UDP Server ended\n");
 
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 if (receiveSocket != null) {
                     receiveSocket.close();
-                    Log.d(TAG, "socket.close()");
+                    Log.d(TAG, "receiveSocket is closed\n");
                 }
             }
         }
@@ -219,7 +212,7 @@ public class MainActivity extends Activity {
         public void run(){
             try {
                 sendSocket = new DatagramSocket(udpSenderPort);
-                Log.d(TAG, "Started sending to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
+                Log.d(TAG, "Started sending packets to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
                 String s;
                 byte[] buf;
                 DatagramPacket packet;
@@ -236,6 +229,7 @@ public class MainActivity extends Activity {
             } finally {
                 if (sendSocket != null) {
                     sendSocket.close();
+                    Log.d(TAG, "sendSocket is closed\n");
                 }
             }
         }
@@ -256,27 +250,20 @@ public class MainActivity extends Activity {
                             .getInetAddresses();
                     while (enumInetAddress.hasMoreElements()) {
                         InetAddress inetAddress = enumInetAddress.nextElement();
-
                         if (inetAddress.isSiteLocalAddress()) {
-                            ip += "SiteLocalAddress: "
+                            ip += "LocalAddress: "
                                     + inetAddress.getHostAddress() + "\n";
                         }
-
                     }
-
                 }
-
             } catch (SocketException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
                 ip += "Something Wrong! " + e.toString() + "\n";
             }
-
             return ip;
         }
 
 
-        ////////////////////////////////////////// Sensors Classes ////////////////////////////////
         @Override
         protected void onResume() {
             super.onResume();
@@ -292,6 +279,8 @@ public class MainActivity extends Activity {
             super.onStop();
         }
 
+
+        ////////////////////////////////////////// Sensors Classes ////////////////////////////////
         private SensorEventListener accelerationListener = new SensorEventListener() {
             @Override
             public void onAccuracyChanged(Sensor sensor, int acc) {

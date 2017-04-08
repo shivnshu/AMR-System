@@ -22,11 +22,16 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 import android.view.KeyEvent;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 
 public class MainActivity extends Activity {
@@ -213,16 +218,21 @@ public class MainActivity extends Activity {
             try {
                 sendSocket = new DatagramSocket(udpSenderPort);
                 Log.d(TAG, "Started sending packets to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
-                String s;
+                JSONObject jsonObject = new JSONObject();
+                ArrayList<Float> floatList = new ArrayList<>();
+                ArrayList<Integer> intList = new ArrayList<>();
                 byte[] buf;
                 DatagramPacket packet;
                 while(running){
-                    //Log.d(TAG, Integer.toString(ScaleUp)+Integer.toString(ScaleDown)+"\n");
-                    s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + " " + Float.toString(w_g) + " " + Integer.toString(ScaleUp) + " " + Integer.toString(ScaleDown) + "\n";
-                    buf = s.getBytes();
+                    floatList.addAll(Arrays.asList(x_g, y_g, z_g, w_g));
+                    jsonObject.put("rotation_vector", floatList);
+                    intList.addAll(Arrays.asList(ScaleUp, ScaleDown));
+                    jsonObject.put("volume_keys", intList);
+                    buf = jsonObject.toString().getBytes();
                     packet = new DatagramPacket(buf, buf.length, address, port);
-                    //Log.d(TAG, "Sending "+s+"\n");
                     sendSocket.send(packet);
+                    floatList.clear();
+                    intList.clear();
                 }
             } catch (Exception e){
                 e.printStackTrace();

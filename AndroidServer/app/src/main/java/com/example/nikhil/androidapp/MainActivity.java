@@ -43,15 +43,16 @@ public class MainActivity extends Activity {
         EditText port;
         TextView AX, AY,AZ, GX,GY,GZ,GW,SCALEUP,SCALEDOWN;
         Button button;
-        //static final int UdpServerPORT = 5000;
-        static int UdpServerPORT = 5000;
+        static int udpReceiverPort = 5000;
+        static int udpSenderPort = 9999;
+        static int clientReceiverPort = 8888;
         static int ScaleUp = 0, ScaleDown = 0;
-        UdpServerThread udpServerThread;
-        DatagramSocket socket;
+        udpReceiverThread udpReceiveThread;
+        udpSenderThread udpSendThread;
+        DatagramSocket receiveSocket;
+        DatagramSocket sendSocket;
+        boolean running;
 
-
-
-        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // main // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -65,9 +66,7 @@ public class MainActivity extends Activity {
             textViewPrompt = (TextView) findViewById(R.id.prompt);
 
             port = (EditText) findViewById(R.id._port);
-            port.setText(String.valueOf(UdpServerPORT));
-            //final String Port = port.getText().toString().trim();
-            //UdpServerPORT = Integer.parseInt(port.getText().toString().trim());
+            port.setText(String.valueOf(udpReceiverPort));
 
             AX = (TextView) findViewById(R.id._ax);
             AY = (TextView) findViewById(R.id._ay);
@@ -80,66 +79,64 @@ public class MainActivity extends Activity {
             SCALEDOWN = (TextView) findViewById(R.id._scaledown);
             button = (Button) findViewById(R.id._start_server);
             button.setOnClickListener(connectListener);
-            button.setText("Start/Stop Server");
             infoIp.setText(getIpAddress());
-            infoPort.setText(String.valueOf(UdpServerPORT));
+            infoPort.setText(String.valueOf(udpReceiverPort));
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
+            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
             acc_disp = false;
             updateState("UDP Server is not running");
         }
-        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            if(ScaleUp ==1) ScaleUp =0;
-            else if(ScaleUp==0) ScaleUp=1;
-            return true;
-        }
-        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-            if(ScaleDown ==1) ScaleDown =0;
-            else if(ScaleDown==0) ScaleDown=1;            return true;
+
+        public boolean onKeyDown(int keyCode, KeyEvent event) {
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                ScaleUp = (ScaleUp+1)%2;
+                return true;
+            }
+            else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                ScaleDown = (ScaleDown+1)%2;
+                return true;
+            }
+
+            else {
+                ScaleUp = 0;
+                ScaleDown = 0;
+                return super.onKeyDown(keyCode, event);
+            }
         }
 
-        else {
-            ScaleUp = 0;    ScaleDown = 0;
-            return super.onKeyDown(keyCode, event);
-        }
-    }
-        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // UDP Server // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
+
+
         private Button.OnClickListener connectListener = new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try
                 {
-                    UdpServerPORT = Integer.parseInt(port.getText().toString());
+                    udpReceiverPort = Integer.parseInt(port.getText().toString());
                 }
                 catch (NumberFormatException e)
                 {
                     // handle the exception
                 }
                 if (!connected) {
-
-                    //button.setText("Stop");
-                    infoPort.setText(String.valueOf(UdpServerPORT));
+                    infoPort.setText(String.valueOf(udpReceiverPort));
                     connected = true;
-                    udpServerThread = new UdpServerThread(UdpServerPORT);
-                    udpServerThread.start();
+                    udpReceiveThread = new udpReceiverThread(udpReceiverPort);
+                    udpReceiveThread.start();
                 }
                 else{
-                    //button.setText("Start Server");
-                    udpServerThread.setRunning(false);
+                    udpReceiveThread.setRunning(false);
                     updateState("UDP Server is not running");
                     connected=false;
                     acc_disp=false;
 
-                    if(!socket.isClosed()) {
-                           socket.close();
+                    if(!receiveSocket.isClosed()) {
+                           receiveSocket.close();
                            Log.d(TAG, "socket.close()");
                     }
-                    //socke10t.close();
+                    //socket.close();
                 }
             }
         };
@@ -153,83 +150,100 @@ public class MainActivity extends Activity {
             });
         }
 
-        private void updatePrompt(final String prompt) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    textViewPrompt.append(prompt);
-                }
-            });
+    private class udpReceiverThread extends Thread {
+        int serverPort;
+
+
+        private udpReceiverThread(int serverPort) {
+            super();
+            this.serverPort = serverPort;
         }
 
-        private class UdpServerThread extends Thread {
+        private void setRunning(boolean running) {
 
-            int serverPort;
-            boolean running;
-
-            public UdpServerThread(int serverPort) {
-                super();
-                this.serverPort = serverPort;
             }
 
-            public void setRunning(boolean running) {
-                this.running = running;
-            }
+        @Override
+        public void run() {
 
-            @Override
-            public void run() {
+            running = true;
 
-                running = true;
+            try {
+                receiveSocket = new DatagramSocket(serverPort);
 
-                try {
-                    socket = new DatagramSocket(serverPort);
+                updateState("UDP Server is running");
+                Log.d(TAG, "UDP Server is running");
 
-                    updateState("UDP Server is running");
-                    Log.d(TAG, "UDP Server is running");
+                while (running) {
+                    byte[] buf = new byte[256];
 
-                    while (running) {
-                        byte[] buf = new byte[256];
+                    // receive request
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
+                    Log.d(TAG, "waiting for connection at" + port+"\n");
+                    receiveSocket.receive(packet);     //this code block the program flow
+                    Log.d(TAG, "Got connection\n");
+                    // send the response to the client at "address" and "port"
+                    InetAddress address = packet.getAddress();
+                    int port = packet.getPort();
 
-                        // receive request
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                        Log.d(TAG, "waiting for connection at" + port);
-                        socket.receive(packet);     //this code block the program flow
-                        Log.d(TAG, "Got connection");
-                        // send the response to the client at "address" and "port"
-                        InetAddress address = packet.getAddress();
-                        int port = packet.getPort();
+                    updateState("Request from: " + address + ":" + port + "\n");
+                    udpSendThread = new udpSenderThread(address, clientReceiverPort);
+                    udpSendThread.run();
+                }
 
-                        updateState("Request from: " + address + ":" + port + "\n");
-                        String s;
-                        while(true && running){
-                            Log.d(TAG, Integer.toString(ScaleUp)+Integer.toString(ScaleDown)+"\n");
-                            s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + " " + Float.toString(w_g) + " " + Integer.toString(ScaleUp) + " " + Integer.toString(ScaleDown) + "\n";
-                            buf = s.getBytes();
-                            packet = new DatagramPacket(buf, buf.length, address, port);
-                            socket.send(packet);
-                            //Thread.sleep(8);
+                Log.e(TAG, "UDP Server ended");
 
-                        }
-
-                    }
-
-                    Log.e(TAG, "UDP Server ended");
-
-                } catch (SocketException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (socket != null) {
-
-                        socket.close();
-                        Log.d(TAG, "socket.close()");
-
-                    }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (receiveSocket != null) {
+                    receiveSocket.close();
+                    Log.d(TAG, "socket.close()");
                 }
             }
         }
+    }
 
+
+    ///////////////////////////////   Sending Thread   ////////////////////////////////
+    private class udpSenderThread extends Thread{
+        private InetAddress address;
+        private int port;
+
+        private udpSenderThread(InetAddress address, int port) {
+            this.address = address;
+            this.port = port;
+        }
+
+        @Override
+        public void run(){
+            try {
+                sendSocket = new DatagramSocket(udpSenderPort);
+                Log.d(TAG, "Started sending to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
+                String s;
+                byte[] buf;
+                DatagramPacket packet;
+                while(running){
+                    //Log.d(TAG, Integer.toString(ScaleUp)+Integer.toString(ScaleDown)+"\n");
+                    s = Float.toString(x_g) + " " + Float.toString(y_g) + " " + Float.toString(z_g) + " " + Float.toString(w_g) + " " + Integer.toString(ScaleUp) + " " + Integer.toString(ScaleDown) + "\n";
+                    buf = s.getBytes();
+                    packet = new DatagramPacket(buf, buf.length, address, port);
+                    //Log.d(TAG, "Sending "+s+"\n");
+                    sendSocket.send(packet);
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            } finally {
+                if (sendSocket != null) {
+                    sendSocket.close();
+                }
+            }
+        }
+
+    }
+
+
+    //////////////////// Function to get current Server IP /////////////////////////////
         private String getIpAddress() {
             String ip = "";
             try {
@@ -260,20 +274,16 @@ public class MainActivity extends Activity {
 
             return ip;
         }
-        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
 
-        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ // accelerometer classes // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
-        private void init_perif() {
-            // smthing
-        }
 
+        ////////////////////////////////////////// Sensors Classes ////////////////////////////////
         @Override
         protected void onResume() {
             super.onResume();
             sensorManager.registerListener(accelerationListener, sensor,
-                    sensorManager.SENSOR_DELAY_NORMAL);
+                    50000);
             sensorManager.registerListener(gyroListener, sensor_gyro,
-                    sensorManager.SENSOR_DELAY_FASTEST);
+                    50000);
         }
 
         @Override
@@ -314,7 +324,8 @@ public class MainActivity extends Activity {
                 x_g = event.values[0];
                 y_g = event.values[1];
                 z_g = event.values[2];
-                w_g = event.values[3];
+                //w_g = event.values[3];
+                w_g = 0;
                 GX.setText( "g_x:"+Float.toString(x_g));
                 GY.setText( "g_y:"+Float.toString(y_g));
                 GZ.setText( "g_z:"+Float.toString(z_g));
@@ -322,5 +333,4 @@ public class MainActivity extends Activity {
 
             }
         };
-        // ¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤¤ //
     }

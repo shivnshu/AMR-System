@@ -59,16 +59,16 @@
         android:textColorLink="?attr/actionModeSplitBackground" />
 
     <Button
-        android:text="START SERVER"
+        android:id="@+id/_start_server"
+        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/_start_server"
+        android:background="@android:drawable/btn_default_small"
         android:elevation="12dp"
-        tools:elevation="5dp"
-        style="@style/Widget.AppCompat.Button"
-        android:textSize="14sp"
+        android:text="Start/Stop Server"
         android:textColor="@android:color/background_dark"
-        android:background="@android:drawable/btn_default_small" />
+        android:textSize="14sp"
+        tools:elevation="5dp" />
 
     <TextView
         android:text="gx"

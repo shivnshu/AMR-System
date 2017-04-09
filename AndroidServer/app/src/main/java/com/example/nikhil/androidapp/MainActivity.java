@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
+            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
             updateState("UDP Server is not running");
             Log.d(TAG, "TAG string is " + TAG + "\n");
         }
@@ -186,7 +186,7 @@ public class MainActivity extends Activity {
 
                     updateState("Request from: " + address + ":" + port + "\n");
                     udpSendThread = new udpSenderThread(address, clientReceiverPort);
-                    udpSendThread.run();
+                    udpSendThread.start();
                 }
 
                 Log.e(TAG, "UDP Server ended\n");
@@ -233,6 +233,7 @@ public class MainActivity extends Activity {
                     sendSocket.send(packet);
                     floatList.clear();
                     intList.clear();
+                    Thread.sleep(25);
                 }
             } catch (Exception e){
                 e.printStackTrace();

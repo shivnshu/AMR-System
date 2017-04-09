@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
             sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
+            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
             updateState("UDP Server is not running");
             Log.d(TAG, "TAG string is " + TAG + "\n");
         }
@@ -219,20 +219,27 @@ public class MainActivity extends Activity {
                 sendSocket = new DatagramSocket(udpSenderPort);
                 Log.d(TAG, "Started sending packets to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
                 JSONObject jsonObject = new JSONObject();
-                ArrayList<Float> floatList = new ArrayList<>();
-                ArrayList<Integer> intList = new ArrayList<>();
+                JSONObject floatJsonHelper = new JSONObject();
+                JSONObject intJsonHelper = new JSONObject();
+                //ArrayList<Float> floatList = new ArrayList<>();
+                //ArrayList<Integer> intList = new ArrayList<>();
                 byte[] buf;
                 DatagramPacket packet;
                 while(running){
-                    floatList.addAll(Arrays.asList(x_g, y_g, z_g, w_g));
-                    jsonObject.put("rotation_vector", floatList);
-                    intList.addAll(Arrays.asList(ScaleUp, ScaleDown));
-                    jsonObject.put("volume_keys", intList);
+                    floatJsonHelper.put("x", x_g);
+                    floatJsonHelper.put("y", y_g);
+                    floatJsonHelper.put("z", z_g);
+                    floatJsonHelper.put("w", w_g);
+                    //floatList.addAll(Arrays.asList(x_g, y_g, z_g, w_g));
+                    jsonObject.put("rotation_vector", floatJsonHelper);
+                    //intList.addAll(Arrays.asList(ScaleUp, ScaleDown));
+                    intJsonHelper.put("volumeUp", ScaleUp);
+                    intJsonHelper.put("volumeDown", ScaleDown);
+                    jsonObject.put("volume_keys", intJsonHelper);
                     buf = jsonObject.toString().getBytes();
                     packet = new DatagramPacket(buf, buf.length, address, port);
                     sendSocket.send(packet);
-                    floatList.clear();
-                    intList.clear();
+
                     Thread.sleep(25);
                 }
             } catch (Exception e){
@@ -324,8 +331,8 @@ public class MainActivity extends Activity {
                 x_g = event.values[0];
                 y_g = event.values[1];
                 z_g = event.values[2];
-                //w_g = event.values[3];
-                w_g = 0;
+                w_g = event.values[3];
+                //w_g = 0;
                 GX.setText( "g_x:"+Float.toString(x_g));
                 GY.setText( "g_y:"+Float.toString(y_g));
                 GZ.setText( "g_z:"+Float.toString(z_g));

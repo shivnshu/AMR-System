@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 
-import sys, socket, math
+import sys, socket, math, json
 
 if len(sys.argv) != 4:
     print "[Usage: ./client.py <server_ip> <server_port> <listening_port>]"
@@ -21,4 +21,5 @@ print "Packet sent"
 
 while 1:
     data, addr = sockRecv.recvfrom(1024)
-    print data
+    j = json.loads(data)
+    print j

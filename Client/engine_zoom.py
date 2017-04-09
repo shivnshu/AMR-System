@@ -11,6 +11,7 @@ from OCC.TopLoc import TopLoc_Location
 
 
 import socket
+import json
 import math
 
 step_reader = STEPControl_Reader()
@@ -29,39 +30,37 @@ else:
     sys.exit(0)
 
 def start_animation(event=None):
-    server_address = ("172.27.30.2", 5000)                                 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)                                                                                           
+    server_address = ("192.168.0.107", 5000)                                 
+    sockSend = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sockRecv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sockRecv.bind(("", 8888))
+
     msg = 'c'                                                              
-    sock.sendto(msg, server_address)                                       
-    c = 0                                                                  
+    sockSend.sendto(msg, server_address)                                       
     zoomIn_old = 0
     zoomOut_old = 0
     while True:                                                            
-        data, addr = sock.recvfrom(1024) # buffer size is 1024 byte        
-        arr =  data.split()                                                
-        x = round(float(arr[0]), 2)                                        
-        y = round(float(arr[1]), 2)                                        
-        z = round(float(arr[2]), 2)                                        
-        w = round(float(arr[3]), 2) 
-        zoomIn = int(arr[4])
-        zoomOut = int(arr[5])
-        c = c + 1                                                          
-        if c==100:                                                          
-#            display.ZoomFactor(2)
-            if(zoomIn != zoomIn_old):
-                display.ZoomFactor(1.1)
-                zoomIn_old = zoomIn
-            if(zoomOut != zoomOut_old):
-                display.ZoomFactor(0.9)
-                zoomOut_old = zoomOut
-            ax1 = gp_Ax1(gp_Pnt(10., 10., 10.), gp_Dir(x, y, z))           
-            aCubeTrsf = gp_Trsf()                                          
-            angle = 2*math.acos(w)                                         
-            aCubeTrsf.SetRotation(ax1, angle)                              
-            aCubeToploc = TopLoc_Location(aCubeTrsf)                       
-            display.Context.SetLocation(ais_boxshp, aCubeToploc)           
-            display.Context.UpdateCurrentViewer()                          
-            c = 0                                                          
+        data, addr = sockRecv.recvfrom(1024) # buffer size is 1024 byte        
+	j = json.loads(data)
+        x = round(j['rotation_vector']['x'], 2)                                
+        y = round(j['rotation_vector']['y'], 2)                                
+        z = round(j['rotation_vector']['z'], 2)                           
+        w = round(j['rotation_vector']['w'], 2) 
+        zoomIn = j['volume_keys']['volumeUp']
+        zoomOut = j['volume_keys']['volumeDown']
+    	if(zoomIn != zoomIn_old):
+		display.ZoomFactor(1.1)
+		zoomIn_old = zoomIn
+    	if(zoomOut != zoomOut_old):
+		display.ZoomFactor(0.9)
+		zoomOut_old = zoomOut
+    	ax1 = gp_Ax1(gp_Pnt(10., 10., 10.), gp_Dir(x, y, z))           
+    	aCubeTrsf = gp_Trsf()                                          
+    	angle = 2*math.acos(w)                                         
+    	aCubeTrsf.SetRotation(ax1, angle)                              
+    	aCubeToploc = TopLoc_Location(aCubeTrsf)                       
+    	display.Context.SetLocation(ais_boxshp, aCubeToploc)           
+        display.Context.UpdateCurrentViewer()                          
 
 display, start_display, add_menu, add_function_to_menu = init_display()
 add_menu('animation')

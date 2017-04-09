@@ -23,6 +23,7 @@ import time
 import socket
 import math
 import json
+import sys
 from math import pi
 
 from OCC.gp import gp_Ax1, gp_Pnt, gp_Dir, gp_Trsf
@@ -42,9 +43,9 @@ def build_shape():
 
 
 def rotating_cube_1_axis(event=None):
-    server_address = ("172.27.30.2", 5000)
+    server_address = ("192.168.0.107", 5000)
     sockSend = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sockRecv = socket.socket(socket,AF_INET, socket.SOCK_DGRAM)
+    sockRecv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sockRecv.bind(("", 8888))
  
     msg = 'c'
@@ -55,12 +56,12 @@ def rotating_cube_1_axis(event=None):
     while True:
         data, addr = sockRecv.recvfrom(1024) # buffer size is 1024 byte
         j = json.loads(data)
-        x = round(float(j['rotation_vector'][0]), 2)
-        y = round(float(j['rotation_vector'][1]), 2)
-        z = round(float(j['rotation_vector'][2]), 2)
-        w = round(float(j['rotation_vector'][3]), 2)
-        zoomIn = int(j['volume_keys'][0])
-        zoomOut = int(j['volume_keys'][1])
+        x = round(j['rotation_vector']['x'], 2)
+        y = round(j['rotation_vector']['y'], 2)
+        z = round(j['rotation_vector']['z'], 2)
+        w = round(j['rotation_vector']['w'], 2)
+        zoomIn = j['volume_keys']['volumeUp']
+        zoomOut = j['volume_keys']['volumeDown']
         # display.EraseAll()
         if(zoomIn != zoomIn_old):
             display.ZoomFactor(1.1)

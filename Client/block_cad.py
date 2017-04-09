@@ -55,12 +55,12 @@ def rotating_cube_1_axis(event=None):
     while True:
         data, addr = sockRecv.recvfrom(1024) # buffer size is 1024 byte
         j = json.loads(data)
-        x = j['rotation_vector'][0]
-        y = j['rotation_vector'][1]
-        z = j['rotation_vector'][2]
-        w = j['rotation_vector'][3]
-        zoomIn = j['volume_keys'][0] 
-        zoomOut = j['volume_keys'][1]
+        x = round(float(j['rotation_vector'][0]), 2)
+        y = round(float(j['rotation_vector'][1]), 2)
+        z = round(float(j['rotation_vector'][2]), 2)
+        w = round(float(j['rotation_vector'][3]), 2)
+        zoomIn = int(j['volume_keys'][0])
+        zoomOut = int(j['volume_keys'][1])
         # display.EraseAll()
         if(zoomIn != zoomIn_old):
             display.ZoomFactor(1.1)

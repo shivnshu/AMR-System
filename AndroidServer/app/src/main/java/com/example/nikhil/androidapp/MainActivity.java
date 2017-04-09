@@ -189,7 +189,7 @@ public class MainActivity extends Activity {
                     udpSendThread.start();
                 }
 
-                Log.e(TAG, "UDP Server ended\n");
+                Log.d(TAG, "UDP Server ended\n");
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -219,27 +219,22 @@ public class MainActivity extends Activity {
                 sendSocket = new DatagramSocket(udpSenderPort);
                 Log.d(TAG, "Started sending packets to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
                 JSONObject jsonObject = new JSONObject();
-                JSONObject floatJsonHelper = new JSONObject();
-                JSONObject intJsonHelper = new JSONObject();
-                //ArrayList<Float> floatList = new ArrayList<>();
-                //ArrayList<Integer> intList = new ArrayList<>();
+                JSONObject rotationJsonObj = new JSONObject();
+                JSONObject volumeJsonObj = new JSONObject();
                 byte[] buf;
                 DatagramPacket packet;
                 while(running){
-                    floatJsonHelper.put("x", x_g);
-                    floatJsonHelper.put("y", y_g);
-                    floatJsonHelper.put("z", z_g);
-                    floatJsonHelper.put("w", w_g);
-                    //floatList.addAll(Arrays.asList(x_g, y_g, z_g, w_g));
-                    jsonObject.put("rotation_vector", floatJsonHelper);
-                    //intList.addAll(Arrays.asList(ScaleUp, ScaleDown));
-                    intJsonHelper.put("volumeUp", ScaleUp);
-                    intJsonHelper.put("volumeDown", ScaleDown);
-                    jsonObject.put("volume_keys", intJsonHelper);
+                    rotationJsonObj.put("x", x_g);
+                    rotationJsonObj.put("y", y_g);
+                    rotationJsonObj.put("z", z_g);
+                    rotationJsonObj.put("w", w_g);
+                    jsonObject.put("rotation_vector", rotationJsonObj);
+                    volumeJsonObj.put("volumeUp", ScaleUp);
+                    volumeJsonObj.put("volumeDown", ScaleDown);
+                    jsonObject.put("volume_keys", volumeJsonObj);
                     buf = jsonObject.toString().getBytes();
                     packet = new DatagramPacket(buf, buf.length, address, port);
                     sendSocket.send(packet);
-
                     Thread.sleep(25);
                 }
             } catch (Exception e){

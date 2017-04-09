@@ -168,7 +168,7 @@ public class MainActivity extends Activity {
 
             try {
                 receiveSocket = new DatagramSocket(serverPort);
-
+                sendSocket = new DatagramSocket(udpSenderPort);
                 updateState("UDP Server is running");
                 Log.d(TAG, "UDP Server is running\n");
 
@@ -216,7 +216,6 @@ public class MainActivity extends Activity {
         @Override
         public void run(){
             try {
-                sendSocket = new DatagramSocket(udpSenderPort);
                 Log.d(TAG, "Started sending packets to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
                 JSONObject jsonObject = new JSONObject();
                 JSONObject rotationJsonObj = new JSONObject();

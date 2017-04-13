@@ -1,25 +1,13 @@
 #!/usr/bin/python2
 
-import sys, socket, math, json
+import sys
+from amr_client_lib import amr_connection
 
 if len(sys.argv) != 4:
     print "[Usage: ./client.py <server_ip> <server_port> <listening_port>]"
     sys.exit(0)
 
-serverAddress = (sys.argv[1], int(sys.argv[2]))
-listeningPort = int(sys.argv[3])
-
-sockSend = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sockRecv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-print "Listening to", listeningPort
-sockRecv.bind(("", listeningPort))
-msg = 'c'
-print "Sending a packet to server"
-sockSend.sendto(msg, serverAddress)
-print "Packet sent"
+feed = amr_connection(sys.argv[1], sys.argv[2], sys.argv[3])
 
 while 1:
-    data, addr = sockRecv.recvfrom(1024)
-    j = json.loads(data)
-    print j
+	print feed.get_data(["rotation_sensor"])

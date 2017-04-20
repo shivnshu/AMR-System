@@ -38,18 +38,17 @@ public class MainActivity extends Activity {
         private final static String TAG = MainActivity.class.getSimpleName();
 
         private SensorManager sensorManager;
-        private Sensor sensor,sensor_gyro;
-        private float x, y, z;
-        private float x_g, y_g, z_g,w_g;
+        private Sensor sensor;
+        private float x, y, z, w;
         TextView infoIp, infoPort;
         TextView textViewState, textViewPrompt;
         EditText port;
-        TextView AX, AY,AZ, GX,GY,GZ,GW,SCALEUP,SCALEDOWN;
+        TextView X, Y, Z, W, volumeUpView, volumeDownView;
         Button button;
         static int udpReceiverPort = 5000;
         static int udpSenderPort = 9999;
         static int clientReceiverPort = 8888;
-        static int ScaleUp = 0, ScaleDown = 0;
+        static int volumeUp = 0, volumeDown = 0;
         udpReceiverThread udpReceiveThread;
         udpSenderThread udpSendThread;
         DatagramSocket receiveSocket;
@@ -71,23 +70,18 @@ public class MainActivity extends Activity {
             port = (EditText) findViewById(R.id._port);
             port.setText(String.valueOf(udpReceiverPort));
 
-            AX = (TextView) findViewById(R.id._ax);
-            AY = (TextView) findViewById(R.id._ay);
-            AZ = (TextView) findViewById(R.id._az);
-            GX = (TextView) findViewById(R.id._gx);
-            GY = (TextView) findViewById(R.id._gy);
-            GZ = (TextView) findViewById(R.id._gz);
-            GW = (TextView) findViewById(R.id._gw);
-            SCALEUP = (TextView) findViewById(R.id._scaleup);
-            SCALEDOWN = (TextView) findViewById(R.id._scaledown);
+            X = (TextView) findViewById(R.id.x);
+            Y = (TextView) findViewById(R.id.y);
+            Z = (TextView) findViewById(R.id.z);
+            W = (TextView) findViewById(R.id.w);
+            volumeUpView = (TextView) findViewById(R.id.volumeUp);
+            volumeDownView = (TextView) findViewById(R.id.volumeDown);
             button = (Button) findViewById(R.id._start_server);
             button.setOnClickListener(connectListener);
             infoIp.setText(getIpAddress());
             infoPort.setText(String.valueOf(udpReceiverPort));
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
-            sensor_gyro = sensorManager.getSensorList(Sensor.TYPE_ROTATION_VECTOR).get(0);
             updateState("UDP Server is not running");
             Log.d(TAG, "TAG string is " + TAG + "\n");
         }
@@ -95,17 +89,17 @@ public class MainActivity extends Activity {
 
         public boolean onKeyDown(int keyCode, KeyEvent event) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                ScaleUp = (ScaleUp+1)%2;
+                volumeUp = (volumeUp+1)%2;
                 return true;
             }
             else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                ScaleDown = (ScaleDown+1)%2;
+                volumeDown = (volumeDown+1)%2;
                 return true;
             }
 
             else {
-                ScaleUp = 0;
-                ScaleDown = 0;
+                volumeUp = 0;
+                volumeDown = 0;
                 return super.onKeyDown(keyCode, event);
             }
         }
@@ -180,6 +174,9 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "waiting for connection at" + port+"\n");
                     receiveSocket.receive(packet);     // this code blocks the program flow
                     Log.d(TAG, "Got connection\n");
+                    sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
+
+                    sensorManager.registerListener(sensorListener, sensor, 50000);
                     // send the response to the client at "address" and "port"
                     InetAddress address = packet.getAddress();
                     int port = packet.getPort();
@@ -223,13 +220,13 @@ public class MainActivity extends Activity {
                 byte[] buf;
                 DatagramPacket packet;
                 while(running){
-                    rotationJsonObj.put("x", x_g);
-                    rotationJsonObj.put("y", y_g);
-                    rotationJsonObj.put("z", z_g);
-                    rotationJsonObj.put("w", w_g);
+                    rotationJsonObj.put("x", x);
+                    rotationJsonObj.put("y", y);
+                    rotationJsonObj.put("z", z);
+                    rotationJsonObj.put("w", w);
                     jsonObject.put("rotation_vector", rotationJsonObj);
-                    volumeJsonObj.put("volumeUp", ScaleUp);
-                    volumeJsonObj.put("volumeDown", ScaleDown);
+                    volumeJsonObj.put("volumeUp", volumeUp);
+                    volumeJsonObj.put("volumeDown", volumeDown);
                     jsonObject.put("volume_keys", volumeJsonObj);
                     buf = jsonObject.toString().getBytes();
                     packet = new DatagramPacket(buf, buf.length, address, port);
@@ -249,89 +246,70 @@ public class MainActivity extends Activity {
     }
 
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        sensorManager.unregisterListener(sensorListener);
+        super.onStop();
+    }
+
+
+    ////////////////////////////////////////// Sensors Classes ////////////////////////////////
+    private SensorEventListener sensorListener = new SensorEventListener() {
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int acc) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+
+            x = event.values[0];
+            y = event.values[1];
+            z = event.values[2];
+            if(event.values.length > 3) {
+                w = event.values[3];
+            }
+            X.setText( "x:"+String.valueOf(x));
+            Y.setText( "y:"+String.valueOf(y));
+            Z.setText( "z:"+String.valueOf(z));
+            W.setText( "w:"+String.valueOf(w));
+            volumeUpView.setText("volumeUp:"+Integer.toString(volumeUp));
+            volumeDownView.setText("volumeDown:"+Integer.toString(volumeDown));
+
+        }
+    };
+
+
+
     //////////////////// Function to get current Server IP /////////////////////////////
-        private String getIpAddress() {
-            String ip = "";
-            try {
-                Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface
-                        .getNetworkInterfaces();
-                while (enumNetworkInterfaces.hasMoreElements()) {
-                    NetworkInterface networkInterface = enumNetworkInterfaces
-                            .nextElement();
-                    Enumeration<InetAddress> enumInetAddress = networkInterface
-                            .getInetAddresses();
-                    while (enumInetAddress.hasMoreElements()) {
-                        InetAddress inetAddress = enumInetAddress.nextElement();
-                        if (inetAddress.isSiteLocalAddress()) {
-                            ip += "LocalAddress: "
-                                    + inetAddress.getHostAddress() + "\n";
-                        }
+    private String getIpAddress() {
+        String ip = "";
+        try {
+            Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface
+                    .getNetworkInterfaces();
+            while (enumNetworkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = enumNetworkInterfaces
+                        .nextElement();
+                Enumeration<InetAddress> enumInetAddress = networkInterface
+                        .getInetAddresses();
+                while (enumInetAddress.hasMoreElements()) {
+                    InetAddress inetAddress = enumInetAddress.nextElement();
+                    if (inetAddress.isSiteLocalAddress()) {
+                        ip += "LocalAddress: "
+                                + inetAddress.getHostAddress() + "\n";
                     }
                 }
-            } catch (SocketException e) {
-                e.printStackTrace();
-                ip += "Something Wrong! " + e.toString() + "\n";
             }
-            return ip;
+        } catch (SocketException e) {
+            e.printStackTrace();
+            ip += "Something Wrong! " + e.toString() + "\n";
         }
-
-
-        @Override
-        protected void onResume() {
-            super.onResume();
-            sensorManager.registerListener(accelerationListener, sensor,
-                    50000);
-            sensorManager.registerListener(gyroListener, sensor_gyro,
-                    50000);
-        }
-
-        @Override
-        protected void onStop() {
-            sensorManager.unregisterListener(accelerationListener);
-            super.onStop();
-        }
-
-
-        ////////////////////////////////////////// Sensors Classes ////////////////////////////////
-        private SensorEventListener accelerationListener = new SensorEventListener() {
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int acc) {
-            }
-
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                x = event.values[0];
-                y = event.values[1];
-                z = event.values[2];
-                //refreshDisplay();
-                AX.setText( "a_x:"+Float.toString(x));
-                AY.setText( "a_y:"+Float.toString(y));
-                AZ.setText( "a_z:"+Float.toString(z));
-                SCALEUP.setText("Scale UP:"+Integer.toString(ScaleUp));
-                SCALEDOWN.setText("Scale DOWN:"+Integer.toString(ScaleDown));
-
-
-            }
-        };
-
-        private SensorEventListener gyroListener = new SensorEventListener() {
-            @Override
-            public void onAccuracyChanged(Sensor sensor_gyro, int acc) {
-            }
-
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-
-                x_g = event.values[0];
-                y_g = event.values[1];
-                z_g = event.values[2];
-                w_g = event.values[3];
-                //w_g = 0;
-                GX.setText( "g_x:"+Float.toString(x_g));
-                GY.setText( "g_y:"+Float.toString(y_g));
-                GZ.setText( "g_z:"+Float.toString(z_g));
-                GW.setText( "g_w:"+Float.toString(w_g));
-
-            }
-        };
+        return ip;
     }
+
+}

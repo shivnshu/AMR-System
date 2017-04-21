@@ -22,6 +22,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -165,6 +166,7 @@ public class MainActivity extends Activity {
                 sendSocket = new DatagramSocket(udpSenderPort);
                 updateState("UDP Server is running");
                 Log.d(TAG, "UDP Server is running\n");
+                String recvString;
 
                 while (running) {
                     byte[] buf = new byte[256];
@@ -174,21 +176,59 @@ public class MainActivity extends Activity {
                     Log.d(TAG, "waiting for connection at" + port+"\n");
                     receiveSocket.receive(packet);     // this code blocks the program flow
                     Log.d(TAG, "Got connection\n");
-                    sensor = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER).get(0);
+                    recvString = new String(packet.getData(), packet.getOffset(), packet.getLength());
+                    updateState(recvString);
+                    Log.d(TAG, recvString +"\n");
+                    if(recvString.equals("TYPE_ACCELEROMETER")) {
+                        if(sensorManager.getSensorList(sensor.TYPE_ACCELEROMETER).size() == 0){
+                            updateState("Sensor not present");
+                            continue;
+                        }
+                        sensor = sensorManager.getSensorList(sensor.TYPE_ACCELEROMETER).get(0);
+                    } else if(recvString.equals("TYPE_ROTATION_VECTOR")){
+                        if(sensorManager.getSensorList(sensor.TYPE_ROTATION_VECTOR).size() == 0){
+                            updateState("Sensor not present");
+                            continue;
+                        }
+                        sensor = sensorManager.getSensorList(sensor.TYPE_ROTATION_VECTOR).get(0);
+                    } else if(recvString.equals("TYPE_GRAVITY")){
+                        if(sensorManager.getSensorList(sensor.TYPE_GRAVITY).size() == 0){
+                            updateState("Sensor not present");
+                            continue;
+                        }
+                        sensor = sensorManager.getSensorList(sensor.TYPE_GRAVITY).get(0);
+                    } else if (recvString.equals("TYPE_LINEAR_ACCELERATION")){
+                        if(sensorManager.getSensorList(sensor.TYPE_LINEAR_ACCELERATION).size() == 0){
+                            updateState("Sensor not present");
+                            continue;
+                        }
+                        sensor = sensorManager.getSensorList(sensor.TYPE_LINEAR_ACCELERATION).get(0);
+                    } else if(recvString.equals("TYPE_GYROSCOPE")) {
+                        if(sensorManager.getSensorList(sensor.TYPE_GYROSCOPE).size() == 0){
+                            updateState("Sensor not present");
+                            continue;
+                        }
+                        sensor = sensorManager.getSensorList(sensor.TYPE_GYROSCOPE).get(0);
+                    } else {
+                        updateState("Invalid sensor");
+                        continue;
+                    }
 
                     sensorManager.registerListener(sensorListener, sensor, 50000);
                     // send the response to the client at "address" and "port"
                     InetAddress address = packet.getAddress();
                     int port = packet.getPort();
 
-                    updateState("Request from: " + address + ":" + port + "\n");
+                    //updateState("Request from: " + address + ":" + port + "\n");
                     udpSendThread = new udpSenderThread(address, clientReceiverPort);
                     udpSendThread.start();
+                    Log.d(TAG, "UDP Send Thread started\n");
                 }
 
                 Log.d(TAG, "UDP Server ended\n");
 
             } catch (Exception e) {
+                Log.d(TAG, e.toString());
                 e.printStackTrace();
             } finally {
                 if (receiveSocket != null) {
@@ -224,10 +264,11 @@ public class MainActivity extends Activity {
                     rotationJsonObj.put("y", y);
                     rotationJsonObj.put("z", z);
                     rotationJsonObj.put("w", w);
-                    jsonObject.put("rotation_vector", rotationJsonObj);
+                    jsonObject.put("sensor", rotationJsonObj);
                     volumeJsonObj.put("volumeUp", volumeUp);
                     volumeJsonObj.put("volumeDown", volumeDown);
                     jsonObject.put("volume_keys", volumeJsonObj);
+                    Log.d(TAG, jsonObject.toString() + '\n');
                     buf = jsonObject.toString().getBytes();
                     packet = new DatagramPacket(buf, buf.length, address, port);
                     sendSocket.send(packet);

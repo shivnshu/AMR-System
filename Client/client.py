@@ -10,4 +10,8 @@ if len(sys.argv) != 4:
 feed = amr_connection(sys.argv[1], sys.argv[2], sys.argv[3])
 
 while 1:
-	print feed.get_data("rotation_sensor")
+    print feed.get_data("TYPE_ACCELEROMETER")
+    # print feed.get_data("TYPE_ROTATION_VECTOR")
+    # print feed.get_data("TYPE_GRAVITY")
+    # print feed.get_data("TYPE_LINEAR_ACCELERATION")
+    # print feed.get_data("TYPE_GYROSCOPE")

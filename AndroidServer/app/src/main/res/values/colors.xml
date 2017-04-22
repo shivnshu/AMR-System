@@ -5,4 +5,14 @@
     <color name="colorAccent">#FF4081</color>
 
     <color name="black_overlay">#66000000</color>
+
+    <!-- Developer's content -->
+    <color name="black">#000000</color>
+    <color name="blue">#0c6c9e</color>
+    <color name="light_green">#0fad85</color>
+    <color name="dark_green">#096850</color>
+    <color name="grey">#777777</color>
+    <color name="light_red">#d53c3c</color>
+    <color name="dark_red">#802424</color>
+    <color name="white">#ffffff</color>
 </resources>

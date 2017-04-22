@@ -43,7 +43,7 @@ def build_shape():
 
 
 def rotating_cube_1_axis(event=None):
-    server_address = ("192.168.0.107", 5000)
+    server_address = ("192.168.0.106", 5000)
     sockSend = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sockRecv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sockRecv.bind(("", 8888))

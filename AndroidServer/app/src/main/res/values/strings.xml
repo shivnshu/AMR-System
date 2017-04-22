@@ -1,7 +1,23 @@
 <resources>
-    <string name="app_name">AndroidApp</string>
+    <string name="app_name">AMR System</string>
 
     <string name="title_activity_start">StartActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <!-- Developer's content -->
+    <string name="user_msg">"Visit "</string>
+    <string name="server_status_off">"Server not running"</string>
+    <string name="server_status_on">"Waiting for client"</string>
+    <string name="server_status_connected">"Connected to: "</string>
+    <string name="sensor_not_present">"Sensor not Present"</string>
+
+    <string name="start_server">START SERVER</string>
+    <string name="stop_server">STOP SERVER</string>
+    <string name="layout_debug">Debug</string>
+    <string name="layout_debug_msg">Coming Soon</string>
+
+    <string name="github_msg">"Visit us on"</string>
+    <string name="github_link">GitHub</string>
+    <string name="github_link_address">https://github.com/shivnshu/AMR-System</string>
 </resources>

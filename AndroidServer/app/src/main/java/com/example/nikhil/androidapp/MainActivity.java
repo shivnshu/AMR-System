@@ -3,52 +3,51 @@ package com.example.nikhil.androidapp;
 import java.net.InetAddress;
 
 
-import java.lang.Object;
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.Timer;
-import java.util.TimerTask;
+
 import android.view.KeyEvent;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
         private final static String TAG = MainActivity.class.getSimpleName();
 
         private SensorManager sensorManager;
         private Sensor sensor;
         private float x, y, z, w;
-        TextView infoIp, infoPort;
-        TextView textViewState, textViewPrompt;
-        EditText port;
-        TextView X, Y, Z, W, volumeUpView, volumeDownView;
+        TextView UserMsg, ServerStatus;
+        TextView GithubLink;
+        Button StartServerButton, DebugButton;
+        // TextView textViewPrompt;
+        // TextView X, Y, Z, W, volumeUpView, volumeDownView;
         Button button;
-        static int udpReceiverPort = 5000;
-        static int udpSenderPort = 9999;
-        static int clientReceiverPort = 8888;
+        static int udpReceiverPort = 1111;
+        static int ClientReceiverPort = 2222;
         static int volumeUp = 0, volumeDown = 0;
         udpReceiverThread udpReceiveThread;
         udpSenderThread udpSendThread;
@@ -60,33 +59,38 @@ public class MainActivity extends Activity {
         protected void onCreate(Bundle savedInstanceState) {
 
             super.onCreate(savedInstanceState);
+            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            getSupportActionBar().setCustomView(R.layout.actionbar);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Window window = getWindow();
+                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
+                // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red)); // // TODO: 23/4/17 Check with om can something good be designed around it
+                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_red)));
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
+                getSupportActionBar().setDisplayShowTitleEnabled(true);
+            }
             setContentView(R.layout.activity_main);
-            this.setTitle("CAD RENDERING CONTROLLER");
+            this.setTitle(getString(R.string.app_name));
 
-            infoIp = (TextView) findViewById(R.id.infoip);
-            infoPort = (TextView) findViewById(R.id.infoport);
-            textViewState = (TextView) findViewById(R.id.state);
-            textViewPrompt = (TextView) findViewById(R.id.prompt);
+            UserMsg = (TextView) findViewById(R.id.user_msg);
+            ServerStatus = (TextView) findViewById(R.id.server_status);
 
-            port = (EditText) findViewById(R.id._port);
-            port.setText(String.valueOf(udpReceiverPort));
+            StartServerButton = (Button) findViewById(R.id.start_server);
+            StartServerButton.setOnClickListener(MainClickListener);
+            DebugButton = (Button) findViewById(R.id.debug);
+            DebugButton.setOnClickListener(MainClickListener);
+            GithubLink = (TextView) findViewById(R.id.github_link);
+            GithubLink.setOnClickListener(MainClickListener);
 
-            X = (TextView) findViewById(R.id.x);
-            Y = (TextView) findViewById(R.id.y);
-            Z = (TextView) findViewById(R.id.z);
-            W = (TextView) findViewById(R.id.w);
-            volumeUpView = (TextView) findViewById(R.id.volumeUp);
-            volumeDownView = (TextView) findViewById(R.id.volumeDown);
-            button = (Button) findViewById(R.id._start_server);
-            button.setOnClickListener(connectListener);
-            infoIp.setText(getIpAddress());
-            infoPort.setText(String.valueOf(udpReceiverPort));
+            UserMsg.setText(getString(R.string.user_msg)+getIpAddress()+":"+String.valueOf(udpReceiverPort));
+            // UserMsg.setText(getString(R.string.user_msg_off));
+            updateServerState(getString(R.string.server_status_off));
+
 
             sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            updateState("UDP Server is not running");
             Log.d(TAG, "TAG string is " + TAG + "\n");
         }
-
 
         public boolean onKeyDown(int keyCode, KeyEvent event) {
             if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -107,44 +111,74 @@ public class MainActivity extends Activity {
 
 
 
-        private Button.OnClickListener connectListener = new Button.OnClickListener() {
+        private Button.OnClickListener MainClickListener = new Button.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try
-                {
-                    udpReceiverPort = Integer.parseInt(port.getText().toString());
-                }
-                catch (NumberFormatException e)
-                {
-                    e.printStackTrace();
-                }
-                if (!running) {
-                    infoPort.setText(String.valueOf(udpReceiverPort));
-                    running = true;
-                    udpReceiveThread = new udpReceiverThread(udpReceiverPort);
-                    udpReceiveThread.start();
-                }
-                else{
-                    running = false;
-                    updateState("UDP Server is not running");
+                if(v.getId() == R.id.start_server) {
+                    if (!running) {
+                        // infoPort.setText(String.valueOf(udpReceiverPort));
+                        // todo: Set a server running animantion change colours of title bar here
+                        // Layout Status changes
+                        // UserMsg.setText(getString(R.string.user_msg_on));
+                        StartServerButton.setText(getString(R.string.stop_server));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Window window = getWindow();
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_green));
+                            // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_green));
+                            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_green)));
+                            getSupportActionBar().setDisplayShowTitleEnabled(false);
+                            getSupportActionBar().setDisplayShowTitleEnabled(true);
+                        }
+                        updateServerState(getString(R.string.server_status_on));
 
-                    if(!receiveSocket.isClosed()) {
-                           receiveSocket.close();
-                           Log.d(TAG, "receiveSocket is closed\n");
+                        running = true;
+                        udpReceiveThread = new udpReceiverThread(udpReceiverPort);
+                        udpReceiveThread.start();
+                    } else {
+                        running = false;
+                        // updateServerState("UDP Server is not running");
+                        // todo: Set all status of not running server here
+                        // UserMsg.setText(getString(R.string.user_msg_off));
+                        StartServerButton.setText(getString(R.string.start_server));
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            Window window = getWindow();
+                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
+                            // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
+                            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_red)));
+                            getSupportActionBar().setDisplayShowTitleEnabled(false);
+                            getSupportActionBar().setDisplayShowTitleEnabled(true);
+                        }
+                        updateServerState(getString(R.string.server_status_off));
+
+                        if (!receiveSocket.isClosed()) {
+                            receiveSocket.close();
+                            Log.d(TAG, "receiveSocket is closed\n");
+                        }
+                        if (!sendSocket.isClosed()) {
+                            sendSocket.close();
+                            Log.d(TAG, "sendSocket is closed\n");
+                        }
                     }
-                    if(!sendSocket.isClosed()) {
-                        sendSocket.close();
-                        Log.d(TAG, "sendSocket is closed\n");
-                    }
+                }
+                else if(v.getId()==R.id.github_link) {
+                    Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(getString(R.string.github_link_address)));
+                    startActivity(viewIntent);
+                }
+                else if(v.getId()==R.id.debug) {
+                    DebugButton.setText(getString(R.string.layout_debug_msg));
                 }
             }
         };
 
-        private void updateState(final String state) {
+        // todo: see if required
+        private void updateServerState(final String state) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    textViewState.setText(state);
+                    //textViewState.setText(state);
+                    ServerStatus.setText(state);
                 }
             });
         }
@@ -163,8 +197,8 @@ public class MainActivity extends Activity {
 
             try {
                 receiveSocket = new DatagramSocket(serverPort);
-                sendSocket = new DatagramSocket(udpSenderPort);
-                updateState("UDP Server is running");
+                sendSocket = new DatagramSocket();
+                updateServerState(getString(R.string.server_status_on));
                 Log.d(TAG, "UDP Server is running\n");
                 String recvString;
 
@@ -173,54 +207,57 @@ public class MainActivity extends Activity {
 
                     // receive request
                     DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                    Log.d(TAG, "waiting for connection at" + port+"\n");
+                    Log.d(TAG, "waiting for connection at" + udpReceiverPort+"\n");
                     receiveSocket.receive(packet);     // this code blocks the program flow
                     Log.d(TAG, "Got connection\n");
                     recvString = new String(packet.getData(), packet.getOffset(), packet.getLength());
-                    updateState(recvString);
-                    Log.d(TAG, recvString +"\n");
+                    updateServerState(recvString);
+                    Log.d(TAG, recvString);
+                    Log.d(TAG, "TYPE_ACCELEROMETER");
                     if(recvString.equals("TYPE_ACCELEROMETER")) {
                         if(sensorManager.getSensorList(sensor.TYPE_ACCELEROMETER).size() == 0){
-                            updateState("Sensor not present");
+                            updateServerState(getString(R.string.sensor_not_present));
                             continue;
                         }
                         sensor = sensorManager.getSensorList(sensor.TYPE_ACCELEROMETER).get(0);
                     } else if(recvString.equals("TYPE_ROTATION_VECTOR")){
                         if(sensorManager.getSensorList(sensor.TYPE_ROTATION_VECTOR).size() == 0){
-                            updateState("Sensor not present");
+                            updateServerState(getString(R.string.sensor_not_present));
                             continue;
-                        }
+
+
+                       }
                         sensor = sensorManager.getSensorList(sensor.TYPE_ROTATION_VECTOR).get(0);
                     } else if(recvString.equals("TYPE_GRAVITY")){
                         if(sensorManager.getSensorList(sensor.TYPE_GRAVITY).size() == 0){
-                            updateState("Sensor not present");
+                            updateServerState(getString(R.string.sensor_not_present));
                             continue;
                         }
                         sensor = sensorManager.getSensorList(sensor.TYPE_GRAVITY).get(0);
                     } else if (recvString.equals("TYPE_LINEAR_ACCELERATION")){
                         if(sensorManager.getSensorList(sensor.TYPE_LINEAR_ACCELERATION).size() == 0){
-                            updateState("Sensor not present");
+                            updateServerState(getString(R.string.sensor_not_present));
                             continue;
                         }
                         sensor = sensorManager.getSensorList(sensor.TYPE_LINEAR_ACCELERATION).get(0);
                     } else if(recvString.equals("TYPE_GYROSCOPE")) {
                         if(sensorManager.getSensorList(sensor.TYPE_GYROSCOPE).size() == 0){
-                            updateState("Sensor not present");
+                            updateServerState(getString(R.string.sensor_not_present));
                             continue;
                         }
                         sensor = sensorManager.getSensorList(sensor.TYPE_GYROSCOPE).get(0);
                     } else {
-                        updateState("Invalid sensor");
+                        updateServerState("Invalid sensor");
                         continue;
                     }
 
                     sensorManager.registerListener(sensorListener, sensor, 50000);
                     // send the response to the client at "address" and "port"
-                    InetAddress address = packet.getAddress();
-                    int port = packet.getPort();
+                    InetAddress ClientAddress = packet.getAddress();
+                    int ClientPort = packet.getPort();
 
-                    //updateState("Request from: " + address + ":" + port + "\n");
-                    udpSendThread = new udpSenderThread(address, clientReceiverPort);
+                    updateServerState(getString(R.string.server_status_connected)+ClientAddress.toString().substring(1)+":"+ClientPort);
+                    udpSendThread = new udpSenderThread(ClientAddress, ClientReceiverPort);
                     udpSendThread.start();
                     Log.d(TAG, "UDP Send Thread started\n");
                 }
@@ -250,10 +287,12 @@ public class MainActivity extends Activity {
             this.port = port;
         }
 
+        // TODO: 22/4/17 Put a simple click to accept authentication procedure
+        // TODO: 22/4/17 close thread when client closes currently a client can start as many threads as he wants
         @Override
         public void run(){
             try {
-                Log.d(TAG, "Started sending packets to ip"+address+":"+port+" using port "+udpSenderPort+"\n");
+                Log.d(TAG, "Started sending packets to ip"+address+":"+port+"\n");
                 JSONObject jsonObject = new JSONObject();
                 JSONObject rotationJsonObj = new JSONObject();
                 JSONObject volumeJsonObj = new JSONObject();
@@ -268,7 +307,7 @@ public class MainActivity extends Activity {
                     volumeJsonObj.put("volumeUp", volumeUp);
                     volumeJsonObj.put("volumeDown", volumeDown);
                     jsonObject.put("volume_keys", volumeJsonObj);
-                    Log.d(TAG, jsonObject.toString() + '\n');
+                    //Log.d(TAG, jsonObject.toString() + '\n');
                     buf = jsonObject.toString().getBytes();
                     packet = new DatagramPacket(buf, buf.length, address, port);
                     sendSocket.send(packet);
@@ -315,12 +354,13 @@ public class MainActivity extends Activity {
             if(event.values.length > 3) {
                 w = event.values[3];
             }
-            X.setText( "x:"+String.valueOf(x));
-            Y.setText( "y:"+String.valueOf(y));
-            Z.setText( "z:"+String.valueOf(z));
-            W.setText( "w:"+String.valueOf(w));
-            volumeUpView.setText("volumeUp:"+Integer.toString(volumeUp));
-            volumeDownView.setText("volumeDown:"+Integer.toString(volumeDown));
+            // TODO: 22/4/17 Close sensor feed when client exits  
+            // X.setText( "x:"+String.valueOf(x));
+            // Y.setText( "y:"+String.valueOf(y));
+            // Z.setText( "z:"+String.valueOf(z));
+            // W.setText( "w:"+String.valueOf(w));
+            // volumeUpView.setText("volumeUp:"+Integer.toString(volumeUp));
+            // volumeDownView.setText("volumeDown:"+Integer.toString(volumeDown));
 
         }
     };
@@ -328,6 +368,7 @@ public class MainActivity extends Activity {
 
 
     //////////////////// Function to get current Server IP /////////////////////////////
+    // TODO: 22/4/17 it is possible to have more than one ip address format accordingly
     private String getIpAddress() {
         String ip = "";
         try {
@@ -341,8 +382,7 @@ public class MainActivity extends Activity {
                 while (enumInetAddress.hasMoreElements()) {
                     InetAddress inetAddress = enumInetAddress.nextElement();
                     if (inetAddress.isSiteLocalAddress()) {
-                        ip += "LocalAddress: "
-                                + inetAddress.getHostAddress() + "\n";
+                        ip += inetAddress.getHostAddress();
                     }
                 }
             }

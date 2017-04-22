@@ -1,6 +1,11 @@
 1. Stop the server whenever no client is connected to conserve battery.
 2. Build a tcp connection and exchange port information there and then establish the udp connection.
+3. Put all the website content on the app itself.
+4. Send receiving port information to the server in very first connection request.
 
 TODO:
 
-Build a TCP thead.
+1. Build a TCP thread.
+2. Properly handle thread closures.
+3. Unsubscribe from sensor data when disconnected or the server is switched off.
+4. Provide some debug information in debug section.

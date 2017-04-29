@@ -26,6 +26,8 @@ import json
 import sys
 from math import pi
 
+from amr_client_lib import amr_connection
+
 from OCC.gp import gp_Ax1, gp_Pnt, gp_Dir, gp_Trsf
 from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCC.TopLoc import TopLoc_Location
@@ -43,23 +45,16 @@ def build_shape():
 
 
 def rotating_cube_1_axis(event=None):
-    server_address = ("192.168.0.106", 5000)
-    sockSend = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sockRecv = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sockRecv.bind(("", 8888))
- 
-    msg = 'c'
-    sockSend.sendto(msg, server_address)
+    feed = amr_connection('192.168.1.101', '1111', '2222')
     zoomIn_old = 0
     zoomOut_old = 0
     ais_boxshp = build_shape()
     while True:
-        data, addr = sockRecv.recvfrom(1024) # buffer size is 1024 byte
-        j = json.loads(data)
-        x = round(j['rotation_vector']['x'], 2)
-        y = round(j['rotation_vector']['y'], 2)
-        z = round(j['rotation_vector']['z'], 2)
-        w = round(j['rotation_vector']['w'], 2)
+        j = feed.get_data("TYPE_ROTATION_VECTOR")
+        x = round(j['sensor']['x'], 2)
+        y = round(j['sensor']['y'], 2)
+        z = round(j['sensor']['z'], 2)
+        w = round(j['sensor']['w'], 2)
         zoomIn = j['volume_keys']['volumeUp']
         zoomOut = j['volume_keys']['volumeDown']
         # display.EraseAll()

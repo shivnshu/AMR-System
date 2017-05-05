@@ -1,4 +1,4 @@
-package com.example.nikhil.androidapp;
+package com.amr_system.nikhil.androidapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

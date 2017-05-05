@@ -1,4 +1,4 @@
-package com.example.nikhil.androidapp;
+package com.amr_system.nikhil.androidapp;
 
 import org.junit.Test;
 

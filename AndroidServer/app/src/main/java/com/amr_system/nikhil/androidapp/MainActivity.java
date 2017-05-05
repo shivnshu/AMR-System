@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         DatagramSocket sendSocket;
         boolean running = false;
 
+        private SimpleWebServer mWebServer;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -325,11 +327,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
+        startWebServer();       // Start WebServer
+    }
+
+    private void startWebServer() {
+        final int port = 8080;
+        mWebServer = new SimpleWebServer(port, getResources().getAssets());
+        mWebServer.start();
     }
 
     @Override
@@ -340,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
         if (!receiveSocket.isClosed()) {
             receiveSocket.close();
             Log.d(TAG, "receiveSocket is closed\n");
@@ -348,7 +356,6 @@ public class MainActivity extends AppCompatActivity {
             sendSocket.close();
             Log.d(TAG, "sendSocket is closed\n");
         }
-        super.onDestroy();
     }
 
 

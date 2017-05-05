@@ -55,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
         DatagramSocket sendSocket;
         boolean running = false;
 
+        private SimpleWebServer mWebServer;
+
         @Override
         protected void onCreate(Bundle savedInstanceState) {
 
@@ -325,17 +327,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
-
     @Override
     protected void onResume() {
         super.onResume();
+        startWebServer();       // Start WebServer
+    }
+
+    private void startWebServer() {
+        final int port = 8080;
+        mWebServer = new SimpleWebServer(port, getResources().getAssets());
+        mWebServer.start();
     }
 
     @Override
     protected void onStop() {
         sensorManager.unregisterListener(sensorListener);
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!receiveSocket.isClosed()) {
+            receiveSocket.close();
+            Log.d(TAG, "receiveSocket is closed\n");
+        }
+        if (!sendSocket.isClosed()) {
+            sendSocket.close();
+            Log.d(TAG, "sendSocket is closed\n");
+        }
     }
 
 
@@ -382,13 +402,13 @@ public class MainActivity extends AppCompatActivity {
                 while (enumInetAddress.hasMoreElements()) {
                     InetAddress inetAddress = enumInetAddress.nextElement();
                     if (inetAddress.isSiteLocalAddress()) {
-                        ip += inetAddress.getHostAddress();
+                        ip = inetAddress.getHostAddress();
                     }
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
-            ip += "Something Wrong! " + e.toString() + "\n";
+            ip = "Something Wrong! " + e.toString() + "\n";
         }
         return ip;
     }

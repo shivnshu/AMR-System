@@ -33,6 +33,11 @@ from OCC.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCC.TopLoc import TopLoc_Location
 from OCC.Display.SimpleGui import init_display
 
+if len(sys.argv) != 4:
+    print("[Usage: ./client.py <server_ip> <server_port> <listener_port]")
+    print ("[SpecificUsage: ./client.py <server_ip> 1111 2222]")
+    sys.exit(0)
+
 display, start_display, add_menu, add_function_to_menu = init_display()
 
 ais_boxshp = None
@@ -45,7 +50,7 @@ def build_shape():
 
 
 def rotating_cube_1_axis(event=None):
-    feed = amr_connection('192.168.1.101', '1111', '2222')
+    feed = amr_connection(sys.argv[1], sys.argv[2], sys.argv[3])
     zoomIn_old = 0
     zoomOut_old = 0
     ais_boxshp = build_shape()

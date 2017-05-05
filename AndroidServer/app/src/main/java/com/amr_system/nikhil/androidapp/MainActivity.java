@@ -338,6 +338,19 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
     }
 
+    @Override
+    protected void onDestroy() {
+        if (!receiveSocket.isClosed()) {
+            receiveSocket.close();
+            Log.d(TAG, "receiveSocket is closed\n");
+        }
+        if (!sendSocket.isClosed()) {
+            sendSocket.close();
+            Log.d(TAG, "sendSocket is closed\n");
+        }
+        super.onDestroy();
+    }
+
 
     ////////////////////////////////////////// Sensors Classes ////////////////////////////////
     private SensorEventListener sensorListener = new SensorEventListener() {
@@ -382,13 +395,13 @@ public class MainActivity extends AppCompatActivity {
                 while (enumInetAddress.hasMoreElements()) {
                     InetAddress inetAddress = enumInetAddress.nextElement();
                     if (inetAddress.isSiteLocalAddress()) {
-                        ip += inetAddress.getHostAddress();
+                        ip = inetAddress.getHostAddress();
                     }
                 }
             }
         } catch (SocketException e) {
             e.printStackTrace();
-            ip += "Something Wrong! " + e.toString() + "\n";
+            ip = "Something Wrong! " + e.toString() + "\n";
         }
         return ip;
     }

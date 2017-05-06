@@ -426,6 +426,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startWebServer() {
         final int port = 8080;
+        // mWebServer = new SimpleWebServer(port, getResources().getAssets());
         mWebServer = new SimpleWebServer(port, getResources().getAssets());
         mWebServer.start();
     }

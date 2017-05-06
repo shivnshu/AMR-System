@@ -25,6 +25,7 @@ import android.widget.TextView;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
@@ -330,7 +331,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        startWebServer();       // Start WebServer
+        //startWebServer();       // Start WebServer
+        ExampleSocketServerThread t = new ExampleSocketServerThread();
+        t.start();
     }
 
     private void startWebServer() {
@@ -338,6 +341,31 @@ public class MainActivity extends AppCompatActivity {
         mWebServer = new SimpleWebServer(port, getResources().getAssets());
         mWebServer.start();
     }
+
+    private class ExampleSocketServerThread extends Thread {
+
+        @Override
+        public void run() {
+            try {
+                int port = 8887; // 843 flash policy port
+                ExampleWebSocketServer s = new ExampleWebSocketServer( new InetSocketAddress("0.0.0.0", port) );
+                s.start();
+                Log.d(TAG, "ChatServer started on port: " + s.getPort() );
+
+                while ( true ) {
+                    String in = "a";
+                    sleep(100);
+                    s.sendToAll( in );
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            } finally {
+
+            }
+        }
+
+    }
+
 
     @Override
     protected void onStop() {

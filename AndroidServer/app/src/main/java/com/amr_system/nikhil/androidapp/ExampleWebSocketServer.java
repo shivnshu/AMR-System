@@ -1,9 +1,16 @@
 package com.amr_system.nikhil.androidapp;
 
 
+import android.os.Environment;
 import android.util.Log;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Collection;
 
 import org.java_websocket.WebSocket;
@@ -40,8 +47,21 @@ public class ExampleWebSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage( WebSocket conn, String message ) {
-        this.sendToAll( message );
+        // this.sendToAll( message );
         Log.d(TAG, conn + ": " + message );
+    }
+
+    @Override
+    public void onMessage(WebSocket conn, ByteBuffer bb) {
+        Log.d(TAG, "abcd:  "+bb.toString());
+        try {
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/" + "out");
+            FileChannel channel = new FileOutputStream(file, false).getChannel();
+            channel.write(bb);
+            channel.close();
+        } catch (IOException e) {
+            Log.e(TAG, "I/O Error: " + e.getMessage());
+        }
     }
 
     @Override

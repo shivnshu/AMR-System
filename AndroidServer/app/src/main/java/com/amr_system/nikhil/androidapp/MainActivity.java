@@ -331,7 +331,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        //startWebServer();       // Start WebServer
+        sensorManager.registerListener(sensorListener, sensorManager.getSensorList(sensor.TYPE_ROTATION_VECTOR).get(0), 50000);
+        startWebServer();       // Start WebServer
         ExampleSocketServerThread t = new ExampleSocketServerThread();
         t.start();
     }
@@ -351,9 +352,20 @@ public class MainActivity extends AppCompatActivity {
                 ExampleWebSocketServer s = new ExampleWebSocketServer( new InetSocketAddress("0.0.0.0", port) );
                 s.start();
                 Log.d(TAG, "ChatServer started on port: " + s.getPort() );
-
+                String in;
                 while ( true ) {
-                    String in = "a";
+                    JSONObject jsonObject = new JSONObject();
+                    JSONObject rotationJsonObj = new JSONObject();
+                    JSONObject volumeJsonObj = new JSONObject();
+                    rotationJsonObj.put("x", x);
+                    rotationJsonObj.put("y", y);
+                    rotationJsonObj.put("z", z);
+                    rotationJsonObj.put("w", w);
+                    jsonObject.put("sensor", rotationJsonObj);
+                    volumeJsonObj.put("volumeUp", volumeUp);
+                    volumeJsonObj.put("volumeDown", volumeDown);
+                    jsonObject.put("volume_keys", volumeJsonObj);
+                    in = jsonObject.toString();
                     sleep(100);
                     s.sendToAll( in );
                 }

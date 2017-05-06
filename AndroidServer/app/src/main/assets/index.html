@@ -43,6 +43,8 @@
 		<script src="./js/Detector.js"></script>
 		<script src="./js/stats.min.js"></script>
 
+    <script src="./js/webSocketClient.js"></script>
+
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -225,10 +227,17 @@
 				var t4 = Math.cos(timer);
 				var t5 = Math.sin(timer);
 
-				var w = t0 * t2 * t4 + t1 * t3 * t5;
-				var x = t0 * t3 * t4 - t1 * t2 * t5;
-				var y = t0 * t2 * t5 + t1 * t3 * t4;
-				var z = t1 * t2 * t4 - t0 * t3 * t5;
+        // var w = t0 * t2 * t4 + t1 * t3 * t5;
+        // var x = t0 * t3 * t4 - t1 * t2 * t5;
+        // var y = t0 * t2 * t5 + t1 * t3 * t4;
+        // var z = t1 * t2 * t4 - t0 * t3 * t5;
+
+        // console.log(sensorsData);
+
+        var x = sensorsData['sensor']['x']
+        var y = sensorsData['sensor']['y']
+        var z = sensorsData['sensor']['z']
+        var w = sensorsData['sensor']['w']
 
 				var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
 				model_mesh.quaternion.copy(rotation_quaternion);

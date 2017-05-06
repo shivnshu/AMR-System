@@ -2,8 +2,8 @@ $(document).ready(function() {
 	ws = new WebSocket("ws://" + "192.168.43.1:8887");
 
 	ws.onmessage = function(event) {
-    $("#messages").append(" " + event.data + " ");
-    //console.log(event.data);
+    var data = JSON.parse(event.data)
+    console.log(data['sensor']['x']);
 	};
 	
 	ws.onclose = function() {

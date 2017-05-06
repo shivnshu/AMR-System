@@ -51,7 +51,7 @@
 
 			var container, stats;
 
-			var camera, cameraTarget, scene, renderer, model_mesh;
+			var camera, cameraTarget, scene, renderer, model_mesh, scaleVector;
 
 			init();
 			animate();
@@ -62,7 +62,6 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera(35.0, window.innerWidth / window.innerHeight, 1.0, 15.0);
-				// camera.position.set(3.0, 0.15, 3.0);
 				camera.position.set(3.0, 3.0, 3.0);
 				camera.quaternion.set(0.0, 0.0, 0.0, 1.0);
 
@@ -70,6 +69,7 @@
 
 				// My Edit
 				cameraTarget = new THREE.Vector3(0.0, 0.0, 0.0);
+        scaleVector = new THREE.Vector3(0.3, 0.3, 0.3);
 
 				// model_declaration
 				model_mesh = new THREE.Mesh();
@@ -107,16 +107,10 @@
 					model_mesh.geometry = geometry;
 					model_mesh.material = meshMaterial;
 
-					// model_mesh.position.set( 0.5, 0.2, 0 );
-					// model_mesh.rotation.set( - Math.PI / 2, Math.PI / 2, 0 );
-
 					// My Edit
 					model_mesh.position.set(0.0, 0.0, 0.0);
 					model_mesh.rotation.set(0.0, 0.0, 0.0);
-					model_mesh.scale.set( 0.3, 0.3, 0.3 );
-
-					// model_mesh.castShadow = true;
-					// model_mesh.receiveShadow = true;
+					model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 
 					// My Edit
 					model_mesh.castShadow = false;
@@ -195,29 +189,19 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
 				render();
 				stats.update();
 
 			}
 
+      var pZoomIn = 0;
+      var pZoomOut = 0;
+
 			function render() {
 
 				var timer = Date.now() * 0.0005;
 
-				// camera.position.x = Math.cos( timer ) * 3;
-				// camera.position.z = Math.sin( timer ) * 3;
-
 				camera.lookAt( cameraTarget );
-
-				// My Edit
-
-				// var t0 = Math.cos(yaw * 0.5);
-				// var t1 = Math.sin(yaw * 0.5);
-				// var t2 = Math.cos(roll * 0.5);
-				// var t3 = Math.sin(roll * 0.5);
-				// var t4 = Math.cos(pitch * 0.5);
-				// var t5 = Math.sin(pitch * 0.5);
 
 				// My Edit
 				var t0 = Math.cos(0.0);
@@ -227,12 +211,8 @@
 				var t4 = Math.cos(timer);
 				var t5 = Math.sin(timer);
 
-        // var w = t0 * t2 * t4 + t1 * t3 * t5;
-        // var x = t0 * t3 * t4 - t1 * t2 * t5;
-        // var y = t0 * t2 * t5 + t1 * t3 * t4;
-        // var z = t1 * t2 * t4 - t0 * t3 * t5;
-
-        // console.log(sensorsData);
+        var zoomIn = sensorsData['volume_keys']['volumeUp'];
+        var zoomOut = sensorsData['volume_keys']['volumeDown']
 
         var x = sensorsData['sensor']['x']
         var y = sensorsData['sensor']['y']
@@ -240,7 +220,21 @@
         var w = sensorsData['sensor']['w']
 
 				var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
+
+        if(zoomIn != pZoomIn){
+          pZoomIn = zoomIn;
+          scaleVector.x = model_mesh.scale.x + 0.05;
+          scaleVector.y = model_mesh.scale.y + 0.05;
+          scaleVector.z = model_mesh.scale.z + 0.05;
+        } else if (zoomOut != pZoomOut){
+          pZoomOut = zoomOut;
+          scaleVector.x = model_mesh.scale.x - 0.05;
+          scaleVector.y = model_mesh.scale.y - 0.05;
+          scaleVector.z = model_mesh.scale.z - 0.05;
+        }
+
 				model_mesh.quaternion.copy(rotation_quaternion);
+        model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 
 				renderer.render( scene, camera );
 			}

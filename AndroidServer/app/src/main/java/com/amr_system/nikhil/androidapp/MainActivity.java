@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
                     volumeJsonObj.put("volumeDown", volumeDown);
                     jsonObject.put("volume_keys", volumeJsonObj);
                     in = jsonObject.toString();
-                    sleep(100);
+                    sleep(10);
                     s.sendToAll( in );
                 }
             } catch (Exception e){

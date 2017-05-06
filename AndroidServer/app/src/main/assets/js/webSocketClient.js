@@ -1,4 +1,4 @@
-	ws = new WebSocket("ws://" + "192.168.43.1:8887");
+	ws = new WebSocket("ws://" + self.location.hostname + ":8887");
   
   var sensorsData;
 

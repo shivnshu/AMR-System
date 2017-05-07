@@ -34,6 +34,8 @@ body {
 			}
 
 		</style>
+    <!-- Bootstrap -->
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
 	</head>
 	<body data-gr-c-s-loaded="true">
 		<script src="./js/three.js"></script>
@@ -45,6 +47,11 @@ body {
 
 		<script src="./js/webSocketClient.js"></script>
 		<script src="./js/upload.js"></script>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="./js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="./js/bootstrap.min.js"></script>
 
 		<script>
 
@@ -231,10 +238,10 @@ function render() {
 				<canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas>
 				<canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas>
 			</div>
-			<div style="position: fixed; bottom: 0px; right: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;">
-				<input type="file" id="filename"/>
-				<input type="button" value="Upload" onclick="sendFile()"/>
-			</div>
+      <div style="position: fixed; bottom: 10px; right: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;">
+        <input class="" type="file" id="filename"/ style="margin-bottom: 5px;">
+        <input class="btn btn-primary" type="button" value="Upload" onclick="sendFile()"/>
+      </div>
 		</div>
 	</body>
 </html>

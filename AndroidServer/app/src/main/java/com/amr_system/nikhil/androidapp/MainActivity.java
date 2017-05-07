@@ -112,8 +112,8 @@ public class MainActivity extends AppCompatActivity {
         verifyStoragePermissions(this);
 
         copyFileOrDir("index.html");
-        copyFileOrDir("upload.html");
         copyFileOrDir("js");
+        copyFileOrDir("css");
         copyFileOrDir("models");
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);

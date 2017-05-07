@@ -2,9 +2,13 @@ ws = new WebSocket("ws://" + self.location.hostname + ":8887");
 var sensorsData;
 
 ws.onmessage = function(event) {
-	sensorsData = JSON.parse(event.data)
+  if(event.data !== "Uploaded!!"){
+	  sensorsData = JSON.parse(event.data)
 		//sensorsData = event.data;
 		//console.log(data['sensor']['x']);
+  } else {
+    location.reload();
+  }
 };
 
 ws.onclose = function() {

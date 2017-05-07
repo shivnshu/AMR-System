@@ -58,6 +58,8 @@ public class webSocketServer extends WebSocketServer {
             FileChannel channel = new FileOutputStream(file, false).getChannel();
             channel.write(bb);
             channel.close();
+            this.sendToAll("Uploaded!!");
+            Log.d(TAG, "Uploaded Model!!\n");
         } catch (IOException e) {
             Log.e(TAG, "I/O Error: " + e.getMessage());
         }
@@ -78,6 +80,8 @@ public class webSocketServer extends WebSocketServer {
                 FileChannel channel = new FileOutputStream(file, false).getChannel();
                 channel.write(f.getPayloadData());
                 channel.close();
+                this.sendToAll("Uploaded!!");
+                Log.d(TAG, "Uploaded Model!!\n");
             } catch (IOException e) {
                 Log.e(TAG, "I/O Error: " + e.getMessage());
             }

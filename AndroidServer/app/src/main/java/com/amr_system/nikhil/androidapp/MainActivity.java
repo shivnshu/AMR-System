@@ -47,27 +47,28 @@ import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
-        private final static String TAG = MainActivity.class.getSimpleName();
 
-        private SensorManager sensorManager;
-        private Sensor sensor;
-        private float x, y, z, w;
-        TextView UserMsg, ServerStatus;
-        TextView GithubLink;
-        Button StartServerButton, DebugButton;
-        // TextView textViewPrompt;
-        // TextView X, Y, Z, W, volumeUpView, volumeDownView;
-        Button button;
-        static int udpReceiverPort = 1111;
-        static int ClientReceiverPort = 2222;
-        static int volumeUp = 0, volumeDown = 0;
-        udpReceiverThread udpReceiveThread;
-        udpSenderThread udpSendThread;
-        DatagramSocket receiveSocket;
-        DatagramSocket sendSocket;
-        boolean running = false;
+    private final static String TAG = MainActivity.class.getSimpleName();
 
-        private SimpleWebServer mWebServer;
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    private float x, y, z, w;
+    TextView UserMsg, ServerStatus;
+    TextView GithubLink;
+    Button StartServerButton, DebugButton;
+    // TextView textViewPrompt;
+    // TextView X, Y, Z, W, volumeUpView, volumeDownView;
+    // Button button;
+    static int udpReceiverPort = 1111;
+    static int ClientReceiverPort = 2222;
+    static int volumeUp = 0, volumeDown = 0;
+    udpReceiverThread udpReceiveThread;
+    udpSenderThread udpSendThread;
+    DatagramSocket receiveSocket;
+    DatagramSocket sendSocket;
+    boolean running = false;
+
+    private SimpleWebServer mWebServer;
 
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
@@ -76,52 +77,51 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
 
-            super.onCreate(savedInstanceState);
-            getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            getSupportActionBar().setCustomView(R.layout.actionbar);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Window window = getWindow();
-                window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
-                // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red)); // // TODO: 23/4/17 Check with om can something good be designed around it
-                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_red)));
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
-                getSupportActionBar().setDisplayShowTitleEnabled(true);
-            }
-            setContentView(R.layout.activity_main);
-            this.setTitle(getString(R.string.app_name));
-
-            UserMsg = (TextView) findViewById(R.id.user_msg);
-            ServerStatus = (TextView) findViewById(R.id.server_status);
-
-            StartServerButton = (Button) findViewById(R.id.start_server);
-            StartServerButton.setOnClickListener(MainClickListener);
-            DebugButton = (Button) findViewById(R.id.debug);
-            DebugButton.setOnClickListener(MainClickListener);
-            GithubLink = (TextView) findViewById(R.id.github_link);
-            GithubLink.setOnClickListener(MainClickListener);
-
-            UserMsg.setText(getString(R.string.user_msg)+getIpAddress()+":"+String.valueOf(udpReceiverPort));
-            // UserMsg.setText(getString(R.string.user_msg_off));
-            updateServerState(getString(R.string.server_status_off));
-            verifyStoragePermissions(this);
-
-            copyFileOrDir("index.html");
-            copyFileOrDir("upload.html");
-            copyFileOrDir("js");
-            copyFileOrDir("models");
-
-            sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-            Log.d(TAG, "TAG string is " + TAG + "\n");
+        super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setCustomView(R.layout.actionbar);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
+            // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red)); // // TODO: 23/4/17 Check with om can something good be designed around it
+            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_red)));
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            getSupportActionBar().setDisplayShowTitleEnabled(true);
         }
+        setContentView(R.layout.activity_main);
+        this.setTitle(getString(R.string.app_name));
+
+        UserMsg = (TextView) findViewById(R.id.user_msg);
+        ServerStatus = (TextView) findViewById(R.id.server_status);
+
+        StartServerButton = (Button) findViewById(R.id.start_server);
+        StartServerButton.setOnClickListener(MainClickListener);
+        DebugButton = (Button) findViewById(R.id.debug);
+        DebugButton.setOnClickListener(MainClickListener);
+        GithubLink = (TextView) findViewById(R.id.github_link);
+        GithubLink.setOnClickListener(MainClickListener);
+
+        UserMsg.setText(getString(R.string.user_msg)+getIpAddress()+":"+String.valueOf(udpReceiverPort));
+        // UserMsg.setText(getString(R.string.user_msg_off));
+        updateServerState(getString(R.string.server_status_off));
+        verifyStoragePermissions(this);
+
+        copyFileOrDir("index.html");
+        copyFileOrDir("upload.html");
+        copyFileOrDir("js");
+        copyFileOrDir("models");
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        Log.d(TAG, "TAG string is " + TAG + "\n");
+    }
 
     private static void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(
@@ -183,95 +183,95 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-        public boolean onKeyDown(int keyCode, KeyEvent event) {
-            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                volumeUp = (volumeUp+1)%2;
-                return true;
-            }
-            else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
-                volumeDown = (volumeDown+1)%2;
-                return true;
-            }
-
-            else {
-                volumeUp = 0;
-                volumeDown = 0;
-                return super.onKeyDown(keyCode, event);
-            }
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+            volumeUp = (volumeUp+1)%2;
+            return true;
+        }
+        else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
+            volumeDown = (volumeDown+1)%2;
+            return true;
         }
 
+        else {
+            volumeUp = 0;
+            volumeDown = 0;
+            return super.onKeyDown(keyCode, event);
+        }
+    }
 
-        private Button.OnClickListener MainClickListener = new Button.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(v.getId() == R.id.start_server) {
-                    if (!running) {
-                        // infoPort.setText(String.valueOf(udpReceiverPort));
-                        // todo: Set a server running animantion change colours of title bar here
-                        // Layout Status changes
-                        // UserMsg.setText(getString(R.string.user_msg_on));
-                        StartServerButton.setText(getString(R.string.stop_server));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Window window = getWindow();
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_green));
-                            // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_green));
-                            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_green)));
-                            getSupportActionBar().setDisplayShowTitleEnabled(false);
-                            getSupportActionBar().setDisplayShowTitleEnabled(true);
-                        }
-                        updateServerState(getString(R.string.server_status_on));
 
-                        running = true;
-                        udpReceiveThread = new udpReceiverThread(udpReceiverPort);
-                        udpReceiveThread.start();
-                    } else {
-                        running = false;
-                        // updateServerState("UDP Server is not running");
-                        // todo: Set all status of not running server here
-                        // UserMsg.setText(getString(R.string.user_msg_off));
-                        StartServerButton.setText(getString(R.string.start_server));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            Window window = getWindow();
-                            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                            window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
-                            // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
-                            getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_red)));
-                            getSupportActionBar().setDisplayShowTitleEnabled(false);
-                            getSupportActionBar().setDisplayShowTitleEnabled(true);
-                        }
-                        updateServerState(getString(R.string.server_status_off));
+    private Button.OnClickListener MainClickListener = new Button.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(v.getId() == R.id.start_server) {
+                if (!running) {
+                    // infoPort.setText(String.valueOf(udpReceiverPort));
+                    // todo: Set a server running animantion change colours of title bar here
+                    // Layout Status changes
+                    // UserMsg.setText(getString(R.string.user_msg_on));
+                    StartServerButton.setText(getString(R.string.stop_server));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Window window = getWindow();
+                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_green));
+                        // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_green));
+                        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_green)));
+                        getSupportActionBar().setDisplayShowTitleEnabled(false);
+                        getSupportActionBar().setDisplayShowTitleEnabled(true);
+                    }
+                    updateServerState(getString(R.string.server_status_on));
 
-                        if (!receiveSocket.isClosed()) {
-                            receiveSocket.close();
-                            Log.d(TAG, "receiveSocket is closed\n");
-                        }
-                        if (!sendSocket.isClosed()) {
-                            sendSocket.close();
-                            Log.d(TAG, "sendSocket is closed\n");
-                        }
+                    running = true;
+                    udpReceiveThread = new udpReceiverThread(udpReceiverPort);
+                    udpReceiveThread.start();
+                } else {
+                    running = false;
+                    // updateServerState("UDP Server is not running");
+                    // todo: Set all status of not running server here
+                    // UserMsg.setText(getString(R.string.user_msg_off));
+                    StartServerButton.setText(getString(R.string.start_server));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        Window window = getWindow();
+                        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                        window.setStatusBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
+                        // window.setNavigationBarColor(ContextCompat.getColor(MainActivity.this, R.color.dark_red));
+                        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(ContextCompat.getColor(MainActivity.this, R.color.light_red)));
+                        getSupportActionBar().setDisplayShowTitleEnabled(false);
+                        getSupportActionBar().setDisplayShowTitleEnabled(true);
+                    }
+                    updateServerState(getString(R.string.server_status_off));
+
+                    if (!receiveSocket.isClosed()) {
+                        receiveSocket.close();
+                        Log.d(TAG, "receiveSocket is closed\n");
+                    }
+                    if (!sendSocket.isClosed()) {
+                        sendSocket.close();
+                        Log.d(TAG, "sendSocket is closed\n");
                     }
                 }
-                else if(v.getId()==R.id.github_link) {
-                    Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(getString(R.string.github_link_address)));
-                    startActivity(viewIntent);
-                }
-                else if(v.getId()==R.id.debug) {
-                    DebugButton.setText(getString(R.string.layout_debug_msg));
-                }
             }
-        };
-
-        // todo: see if required
-        private void updateServerState(final String state) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    //textViewState.setText(state);
-                    ServerStatus.setText(state);
-                }
-            });
+            else if(v.getId()==R.id.github_link) {
+                Intent viewIntent = new Intent("android.intent.action.VIEW", Uri.parse(getString(R.string.github_link_address)));
+                startActivity(viewIntent);
+            }
+            else if(v.getId()==R.id.debug) {
+                DebugButton.setText(getString(R.string.layout_debug_msg));
+            }
         }
+    };
+
+    // todo: see if required
+    private void updateServerState(final String state) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                //textViewState.setText(state);
+                ServerStatus.setText(state);
+            }
+        });
+    }
 
     private class udpReceiverThread extends Thread {
         int serverPort;
@@ -346,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
                     InetAddress ClientAddress = packet.getAddress();
                     int ClientPort = packet.getPort();
 
-                    updateServerState(getString(R.string.server_status_connected)+ClientAddress.toString().substring(1)+":"+ClientPort);
+                    updateServerState(getString(R.string.server_status_connected) + ClientAddress.toString().substring(1) + ":" + ClientPort);
                     udpSendThread = new udpSenderThread(ClientAddress, ClientReceiverPort);
                     udpSendThread.start();
                     Log.d(TAG, "UDP Send Thread started\n");
@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     ///////////////////////////////   Sending Thread   ////////////////////////////////
-    private class udpSenderThread extends Thread{
+    private class udpSenderThread extends Thread {
         private InetAddress address;
         private int port;
 
@@ -420,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         sensorManager.registerListener(sensorListener, sensorManager.getSensorList(sensor.TYPE_ROTATION_VECTOR).get(0), 50000);
         startWebServer();       // Start WebServer
-        ExampleSocketServerThread t = new ExampleSocketServerThread();
+        webSocketServerThread t = new webSocketServerThread();
         t.start();
     }
 
@@ -432,13 +432,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private class ExampleSocketServerThread extends Thread {
+    private class webSocketServerThread extends Thread {
 
         @Override
         public void run() {
             try {
                 int port = 8887; // 843 flash policy port
-                ExampleWebSocketServer s = new ExampleWebSocketServer( new InetSocketAddress("0.0.0.0", port) );
+                webSocketServer s = new webSocketServer( new InetSocketAddress("0.0.0.0", port) );
                 s.start();
                 Log.d(TAG, "ChatServer started on port: " + s.getPort() );
                 String in;

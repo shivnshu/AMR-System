@@ -1,4 +1,4 @@
-package com.amr_system.nikhil.androidapp;
+package com.amr_system.shivnshu.androidapp;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;

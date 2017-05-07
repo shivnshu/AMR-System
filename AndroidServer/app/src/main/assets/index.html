@@ -44,6 +44,7 @@ body {
 		<script src="./js/stats.min.js"></script>
 
 		<script src="./js/webSocketClient.js"></script>
+		<script src="./js/upload.js"></script>
 
 		<script>
 
@@ -222,7 +223,18 @@ function render() {
 	renderer.render( scene, camera );
 }
 
-		</script><div><canvas width="3070" height="1572" style="width: 1535px; height: 786px;"></canvas><div style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"><canvas width="160" height="96" style="width: 80px; height: 48px; display: block;"></canvas><canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas><canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas></div></div>
-
-
-	</body></html>
+		</script>
+		<div>
+			<canvas width="3070" height="1572" style="width: 1535px; height: 786px;"></canvas>
+			<div style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;">
+				<canvas width="160" height="96" style="width: 80px; height: 48px; display: block;"></canvas>
+				<canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas>
+				<canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas>
+			</div>
+			<div style="position: fixed; bottom: 0px; right: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;">
+				<input type="file" id="filename"/>
+				<input type="button" value="Upload" onclick="sendFile()"/>
+			</div>
+		</div>
+	</body>
+</html>

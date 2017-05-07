@@ -477,13 +477,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!receiveSocket.isClosed()) {
-            receiveSocket.close();
-            Log.d(TAG, "receiveSocket is closed\n");
-        }
-        if (!sendSocket.isClosed()) {
-            sendSocket.close();
-            Log.d(TAG, "sendSocket is closed\n");
+        if (running) {
+            if (!receiveSocket.isClosed()) {
+                receiveSocket.close();
+                Log.d(TAG, "receiveSocket is closed\n");
+            }
+            if (!sendSocket.isClosed()) {
+                sendSocket.close();
+                Log.d(TAG, "sendSocket is closed\n");
+            }
         }
     }
 

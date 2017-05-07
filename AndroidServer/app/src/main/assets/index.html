@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" class="gr__threejs_org"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>AMR System</title>
-		
+
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
+body {
+	font-family: Monospace;
+	background-color: #000000;
+	margin: 0px;
+	overflow: hidden;
+}
 
 			#info {
 				color: #fff;
@@ -43,203 +43,164 @@
 		<script src="./js/Detector.js"></script>
 		<script src="./js/stats.min.js"></script>
 
-    <script src="./js/webSocketClient.js"></script>
+		<script src="./js/webSocketClient.js"></script>
 
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+var container, stats;
 
-			var camera, cameraTarget, scene, renderer, model_mesh, scaleVector;
+var camera, cameraTarget, scene, renderer, model_mesh, scaleVector;
 
-			init();
-			animate();
+init();
+animate();
 
-			function init() {
+function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera(35.0, window.innerWidth / window.innerHeight, 1.0, 15.0);
-				camera.position.set(3.0, 3.0, 3.0);
-				camera.quaternion.set(0.0, 0.0, 0.0, 1.0);
+	camera = new THREE.PerspectiveCamera(35.0, window.innerWidth / window.innerHeight, 1.0, 15.0);
+	camera.position.set(3.0, 3.0, 3.0);
+	camera.quaternion.set(0.0, 0.0, 0.0, 1.0);
 
-				// cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+	// cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
 
-				// My Edit
-				cameraTarget = new THREE.Vector3(0.0, 0.0, 0.0);
-        scaleVector = new THREE.Vector3(0.3, 0.3, 0.3);
+	// My Edit
+	cameraTarget = new THREE.Vector3(0.0, 0.0, 0.0);
+	scaleVector = new THREE.Vector3(0.3, 0.3, 0.3);
 
-				// model_declaration
-				model_mesh = new THREE.Mesh();
+	// model_declaration
+	model_mesh = new THREE.Mesh();
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
-
-
-				// Ground
-
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
-				);
-				plane.rotation.x = -Math.PI/2;
-				plane.position.y = -0.5;
-				scene.add( plane );
-
-				plane.receiveShadow = true;
+	scene = new THREE.Scene();
+	scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
 
-				// Binary files
+	// Binary files
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
-				var loader = new THREE.STLLoader();
+	var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+	var loader = new THREE.STLLoader();
 
-				// Colored binary STL
-				loader.load( './models/tmp.stl', function ( geometry ) {
+	// Colored binary STL
+	loader.load( './models/tmp.stl', function ( geometry ) {
 
-					var meshMaterial = material;
-					if (geometry.hasColors) {
-						meshMaterial = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
-					}
+		var meshMaterial = material;
+		if (geometry.hasColors) {
+			meshMaterial = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+		}
 
-					model_mesh.geometry = geometry;
-					model_mesh.material = meshMaterial;
+		model_mesh.geometry = geometry;
+		model_mesh.material = meshMaterial;
 
-					// My Edit
-					model_mesh.position.set(0.0, 0.0, 0.0);
-					model_mesh.rotation.set(0.0, 0.0, 0.0);
-					model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
+		// My Edit
+		model_mesh.position.set(0.0, 0.0, 0.0);
+		model_mesh.rotation.set(0.0, 0.0, 0.0);
+		model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 
-					// My Edit
-					model_mesh.castShadow = false;
-					model_mesh.receiveShadow = false;
+		// My Edit
+		model_mesh.castShadow = false;
+		model_mesh.receiveShadow = false;
 
-					scene.add( model_mesh );
+		scene.add( model_mesh );
 
-				} );
+	} );
 
 
-				// Lights
+	// Lights
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+	scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
 
-				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
-				// renderer
+	// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setClearColor( scene.fog.color );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+	renderer.gammaInput = true;
+	renderer.gammaOutput = true;
 
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderReverseSided = false;
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.renderReverseSided = false;
 
-				container.appendChild( renderer.domElement );
+	container.appendChild( renderer.domElement );
 
-				// stats
+	// stats
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+	stats = new Stats();
+	container.appendChild( stats.dom );
 
-				//
+	//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+	window.addEventListener( 'resize', onWindowResize, false );
 
-			}
+}
 
-			function addShadowedLight( x, y, z, color, intensity ) {
+function onWindowResize() {
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
-				directionalLight.position.set( x, y, z );
-				scene.add( directionalLight );
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
 
-				directionalLight.castShadow = true;
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-				var d = 1;
-				directionalLight.shadow.camera.left = -d;
-				directionalLight.shadow.camera.right = d;
-				directionalLight.shadow.camera.top = d;
-				directionalLight.shadow.camera.bottom = -d;
+}
 
-				directionalLight.shadow.camera.near = 1;
-				directionalLight.shadow.camera.far = 4;
+function animate() {
 
-				directionalLight.shadow.mapSize.width = 1024;
-				directionalLight.shadow.mapSize.height = 1024;
+	requestAnimationFrame( animate );
+	render();
+	stats.update();
 
-				directionalLight.shadow.bias = -0.005;
+}
 
-			}
+var pZoomIn = 0;
+var pZoomOut = 0;
 
-			function onWindowResize() {
+function render() {
+	camera.lookAt( cameraTarget );
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+	var zoomIn, zoomOut, x, y, z, w;
+	if (typeof sensorsData !== 'undefined') {
+		zoomIn = sensorsData['volume_keys']['volumeUp'];
+		zoomOut = sensorsData['volume_keys']['volumeDown'];
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+		x = sensorsData['sensor']['x'];
+		y = sensorsData['sensor']['y'];
+		z = sensorsData['sensor']['z'];
+		w = sensorsData['sensor']['w'];
+	}
+	else {
+		zoomIn = pZoomIn;
+		zoomOut = pZoomOut;
+		x = 0.0;
+		y = 0.0;
+		z = 0.0;
+		w = 1.0;
+	}
 
-			}
+	var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
 
-			function animate() {
+	if(zoomIn != pZoomIn){
+		pZoomIn = zoomIn;
+		scaleVector.x = model_mesh.scale.x + 0.05;
+		scaleVector.y = model_mesh.scale.y + 0.05;
+		scaleVector.z = model_mesh.scale.z + 0.05;
+	} else if (zoomOut != pZoomOut){
+		pZoomOut = zoomOut;
+		scaleVector.x = model_mesh.scale.x - 0.05;
+		scaleVector.y = model_mesh.scale.y - 0.05;
+		scaleVector.z = model_mesh.scale.z - 0.05;
+	}
 
-				requestAnimationFrame( animate );
-				render();
-				stats.update();
+	model_mesh.quaternion.copy(rotation_quaternion);
+	model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 
-			}
-
-      var pZoomIn = 0;
-      var pZoomOut = 0;
-
-			function render() {
-
-				var timer = Date.now() * 0.0005;
-
-				camera.lookAt( cameraTarget );
-
-				// My Edit
-				var t0 = Math.cos(0.0);
-				var t1 = Math.sin(0.0);
-				var t2 = Math.cos(0.0);
-				var t3 = Math.sin(0.0);
-				var t4 = Math.cos(timer);
-				var t5 = Math.sin(timer);
-
-        var zoomIn = sensorsData['volume_keys']['volumeUp'];
-        var zoomOut = sensorsData['volume_keys']['volumeDown']
-
-        var x = sensorsData['sensor']['x']
-        var y = sensorsData['sensor']['y']
-        var z = sensorsData['sensor']['z']
-        var w = sensorsData['sensor']['w']
-
-				var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
-
-        if(zoomIn != pZoomIn){
-          pZoomIn = zoomIn;
-          scaleVector.x = model_mesh.scale.x + 0.05;
-          scaleVector.y = model_mesh.scale.y + 0.05;
-          scaleVector.z = model_mesh.scale.z + 0.05;
-        } else if (zoomOut != pZoomOut){
-          pZoomOut = zoomOut;
-          scaleVector.x = model_mesh.scale.x - 0.05;
-          scaleVector.y = model_mesh.scale.y - 0.05;
-          scaleVector.z = model_mesh.scale.z - 0.05;
-        }
-
-				model_mesh.quaternion.copy(rotation_quaternion);
-        model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
-
-				renderer.render( scene, camera );
-			}
+	renderer.render( scene, camera );
+}
 
 		</script><div><canvas width="3070" height="1572" style="width: 1535px; height: 786px;"></canvas><div style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"><canvas width="160" height="96" style="width: 80px; height: 48px; display: block;"></canvas><canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas><canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas></div></div>
-	
 
-</body></html>
+
+	</body></html>

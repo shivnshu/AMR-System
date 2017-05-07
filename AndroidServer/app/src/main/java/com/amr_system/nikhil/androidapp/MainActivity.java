@@ -69,7 +69,6 @@ public class MainActivity extends AppCompatActivity {
 
         private SimpleWebServer mWebServer;
 
-
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -428,7 +427,7 @@ public class MainActivity extends AppCompatActivity {
     private void startWebServer() {
         final int port = 8080;
         // mWebServer = new SimpleWebServer(port, getResources().getAssets());
-        mWebServer = new SimpleWebServer(port, getResources().getAssets());
+        mWebServer = new SimpleWebServer(port, Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/");
         mWebServer.start();
     }
 

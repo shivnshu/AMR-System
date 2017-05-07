@@ -16,14 +16,12 @@
 
 package com.amr_system.nikhil.androidapp;
 
-import android.content.res.AssetManager;
-import android.os.Environment;
+
 import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,54 +33,29 @@ import java.net.Socket;
 import java.net.SocketException;
 
 /**
- * Implementation of a very basic HTTP server. The contents are loaded from the assets folder. This
+ * Implementation of a very basic HTTP server. The contents are loaded from the given path. This
  * server handles one request at a time. It only supports GET method.
  */
+
 public class SimpleWebServer implements Runnable {
 
     private static final String TAG = "SimpleWebServer";
-
-    /**
-     * The port number we listen to
-     */
     private final int mPort;
-
-    /**
-     * {@link android.content.res.AssetManager} for loading files to serve.
-     */
-    private final AssetManager mAssets;
-
+    private final String servePath;
     private String path;
-
-    /**
-     * True if the server is running.
-     */
     private boolean mIsRunning;
-
-    /**
-     * The {@link java.net.ServerSocket} that we listen to.
-     */
     private ServerSocket mServerSocket;
 
-    /**
-     * WebServer constructor.
-     */
-    public SimpleWebServer(int port, AssetManager assets) {
+    public SimpleWebServer(int port, String path) {
         mPort = port;
-        mAssets = assets;
+        servePath = path;
     }
 
-    /**
-     * This method starts the web server listening to the specified port.
-     */
     public void start() {
         mIsRunning = true;
         new Thread(this).start();
     }
 
-    /**
-     * This method stops the web server
-     */
     public void stop() {
         try {
             mIsRunning = false;
@@ -115,12 +88,6 @@ public class SimpleWebServer implements Runnable {
         }
     }
 
-    /**
-     * Respond to a request from a client.
-     *
-     * @param socket The client socket.
-     * @throws IOException
-     */
     private void handle(Socket socket) throws IOException {
         BufferedReader reader = null;
         PrintStream output = null;
@@ -170,32 +137,19 @@ public class SimpleWebServer implements Runnable {
         }
     }
 
-    /**
-     * Writes a server error response (HTTP/1.0 500) to the given output stream.
-     *
-     * @param output The output stream.
-     */
     private void writeServerError(PrintStream output) {
         output.println("HTTP/1.0 500 Internal Server Error");
         output.flush();
     }
 
-    /**
-     * Loads all the content of {@code fileName}.
-     *
-     * @param fileName The name of the file.
-     * @return The content of the file.
-     * @throws IOException
-     */
     private byte[] loadContent(String fileName) throws IOException {
         InputStream input = null;
         if(fileName.equals("")) {
-            fileName = "index.html";
+            fileName = "index.html";    // Automatic redirection
         }
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
-            path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/" + fileName;
-            //input = mAssets.open(fileName);
+            path = servePath + fileName;
             input = new FileInputStream(path);
             byte[] buffer = new byte[1024];
             int size;
@@ -213,12 +167,6 @@ public class SimpleWebServer implements Runnable {
         }
     }
 
-    /**
-     * Detects the MIME type from the {@code fileName}.
-     *
-     * @param fileName The name of the file.
-     * @return A MIME type.
-     */
     private String detectMimeType(String fileName) {
         if (TextUtils.isEmpty(fileName)) {
             return null;

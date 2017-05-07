@@ -53,6 +53,8 @@ var container, stats;
 
 var camera, cameraTarget, scene, renderer, model_mesh, scaleVector;
 
+var zoomIn, zoomOut, x, y, z, w;
+
 init();
 animate();
 
@@ -187,7 +189,6 @@ var pZoomOut = 0;
 function render() {
 	camera.lookAt( cameraTarget );
 
-	var zoomIn, zoomOut, x, y, z, w;
 	if (typeof sensorsData !== 'undefined') {
 		zoomIn = sensorsData['volume_keys']['volumeUp'];
 		zoomOut = sensorsData['volume_keys']['volumeDown'];
@@ -197,16 +198,11 @@ function render() {
 		z = sensorsData['sensor']['z'];
 		w = sensorsData['sensor']['w'];
 	}
-	else {
-		zoomIn = pZoomIn;
-		zoomOut = pZoomOut;
-		x = 0.0;
-		y = 0.0;
-		z = 0.0;
-		w = 1.0;
-	}
 
 	var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
+	var world_rotation_compensation = new THREE.Quaternion(-0.5, -0.5, -0.5, 0.5);
+	// rotation_quaternion.multiply(world_rotation_compensation);
+	rotation_quaternion = world_rotation_compensation.multiply(rotation_quaternion);
 
 	if(zoomIn != pZoomIn){
 		pZoomIn = zoomIn;

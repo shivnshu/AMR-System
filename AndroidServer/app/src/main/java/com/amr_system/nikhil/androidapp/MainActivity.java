@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     // Button button;
     static int udpReceiverPort = 1111;
     static int ClientReceiverPort = 2222;
+    static int webPort = 8080;
     static int volumeUp = 0, volumeDown = 0;
     udpReceiverThread udpReceiveThread;
     udpSenderThread udpSendThread;
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         GithubLink = (TextView) findViewById(R.id.github_link);
         GithubLink.setOnClickListener(MainClickListener);
 
-        UserMsg.setText(getString(R.string.user_msg)+getIpAddress()+":"+String.valueOf(udpReceiverPort));
+        UserMsg.setText(getString(R.string.user_msg)+getIpAddress()+":"+String.valueOf(webPort));
         // UserMsg.setText(getString(R.string.user_msg_off));
         updateServerState(getString(R.string.server_status_off));
         verifyStoragePermissions(this);
@@ -425,9 +426,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startWebServer() {
-        final int port = 8080;
         // mWebServer = new SimpleWebServer(port, getResources().getAssets());
-        mWebServer = new SimpleWebServer(port, Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/");
+        mWebServer = new SimpleWebServer(webPort, Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/");
         mWebServer.start();
     }
 

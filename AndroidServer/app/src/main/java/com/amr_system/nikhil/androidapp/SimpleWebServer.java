@@ -189,6 +189,9 @@ public class SimpleWebServer implements Runnable {
      */
     private byte[] loadContent(String fileName) throws IOException {
         InputStream input = null;
+        if(fileName.equals("")) {
+            fileName = "index.html";
+        }
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
             path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/" + fileName;

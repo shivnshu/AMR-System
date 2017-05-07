@@ -22,7 +22,7 @@ if len(sys.argv) != 4:
     sys.exit(0)
 
 step_reader = STEPControl_Reader()
-status = step_reader.ReadFile('./models/ice/Assembly1.stp')
+status = step_reader.ReadFile('./models/Assembly1.stp')
  
 if status == IFSelect_RetDone:  # check status
     failsonly = False

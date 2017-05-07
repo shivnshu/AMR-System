@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" class="gr__threejs_org"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>AMR System</title>
-		
+
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
+body {
+	font-family: Monospace;
+	background-color: #000000;
+	margin: 0px;
+	overflow: hidden;
+}
 
 			#info {
 				color: #fff;
@@ -43,200 +43,190 @@
 		<script src="./js/Detector.js"></script>
 		<script src="./js/stats.min.js"></script>
 
+		<script src="./js/webSocketClient.js"></script>
+
 		<script>
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
 
-			var container, stats;
+var container, stats;
 
-			var camera, cameraTarget, scene, renderer, model_mesh;
+var camera, cameraTarget, scene, renderer, model_mesh, scaleVector;
 
-			init();
-			animate();
+init();
+animate();
 
-			function init() {
+function init() {
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
+	container = document.createElement( 'div' );
+	document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera(35.0, window.innerWidth / window.innerHeight, 1.0, 15.0);
-				// camera.position.set(3.0, 0.15, 3.0);
-				camera.position.set(3.0, 3.0, 3.0);
-				camera.quaternion.set(0.0, 0.0, 0.0, 1.0);
+	camera = new THREE.PerspectiveCamera(35.0, window.innerWidth / window.innerHeight, 1.0, 15.0);
+	camera.position.set(3.0, 3.0, 3.0);
+	camera.quaternion.set(0.0, 0.0, 0.0, 1.0);
 
-				// cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
+	// cameraTarget = new THREE.Vector3( 0, -0.25, 0 );
 
-				// My Edit
-				cameraTarget = new THREE.Vector3(0.0, 0.0, 0.0);
+	// My Edit
+	cameraTarget = new THREE.Vector3(0.0, 0.0, 0.0);
+	scaleVector = new THREE.Vector3(0.3, 0.3, 0.3);
 
-				// model_declaration
-				model_mesh = new THREE.Mesh();
+	// model_declaration
+	model_mesh = new THREE.Mesh();
 
-				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
+	scene = new THREE.Scene();
+	scene.fog = new THREE.Fog( 0x72645b, 2, 15 );
 
 
-				// Ground
+	// Binary files
 
-				var plane = new THREE.Mesh(
-					new THREE.PlaneBufferGeometry( 40, 40 ),
-					new THREE.MeshPhongMaterial( { color: 0x999999, specular: 0x101010 } )
-				);
-				plane.rotation.x = -Math.PI/2;
-				plane.position.y = -0.5;
-				scene.add( plane );
+	var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
+	var loader = new THREE.STLLoader();
 
-				plane.receiveShadow = true;
+	// Colored binary STL
+	loader.load( './models/tmp.stl', function ( geometry ) {
 
+		var meshMaterial = material;
+		if (geometry.hasColors) {
+			meshMaterial = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+		}
 
-				// Binary files
+		model_mesh.geometry = geometry;
+		model_mesh.material = meshMaterial;
 
-				var material = new THREE.MeshPhongMaterial( { color: 0xAAAAAA, specular: 0x111111, shininess: 200 } );
-				var loader = new THREE.STLLoader();
+		// My Edit
+		model_mesh.position.set(0.0, 0.0, 0.0);
+		model_mesh.rotation.set(0.0, 0.0, 0.0);
+		model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 
-				// Colored binary STL
-				loader.load( './models/mk16_diesel.stl', function ( geometry ) {
+		// My Edit
+		model_mesh.castShadow = false;
+		model_mesh.receiveShadow = false;
 
-					var meshMaterial = material;
-					if (geometry.hasColors) {
-						meshMaterial = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
-					}
+		scene.add( model_mesh );
 
-					model_mesh.geometry = geometry;
-					model_mesh.material = meshMaterial;
+	} );
 
-					// model_mesh.position.set( 0.5, 0.2, 0 );
-					// model_mesh.rotation.set( - Math.PI / 2, Math.PI / 2, 0 );
 
-					// My Edit
-					model_mesh.position.set(0.0, 0.0, 0.0);
-					model_mesh.rotation.set(0.0, 0.0, 0.0);
-					model_mesh.scale.set( 0.3, 0.3, 0.3 );
+	// Lights
 
-					// model_mesh.castShadow = true;
-					// model_mesh.receiveShadow = true;
+	scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+	addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
+	addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
 
-					// My Edit
-					model_mesh.castShadow = false;
-					model_mesh.receiveShadow = false;
+	// renderer
 
-					scene.add( model_mesh );
+	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer.setClearColor( scene.fog.color );
+	renderer.setPixelRatio( window.devicePixelRatio );
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-				} );
+	renderer.gammaInput = true;
+	renderer.gammaOutput = true;
 
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.renderReverseSided = false;
 
-				// Lights
+	container.appendChild( renderer.domElement );
 
-				scene.add( new THREE.HemisphereLight( 0x443333, 0x111122 ) );
+	// stats
 
-				addShadowedLight( 1, 1, 1, 0xffffff, 1.35 );
-				addShadowedLight( 0.5, 1, -1, 0xffaa00, 1 );
-				// renderer
+	stats = new Stats();
+	container.appendChild( stats.dom );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setClearColor( scene.fog.color );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+	//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+	window.addEventListener( 'resize', onWindowResize, false );
 
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.renderReverseSided = false;
+}
 
-				container.appendChild( renderer.domElement );
+function addShadowedLight( x, y, z, color, intensity ) {
 
-				// stats
+	var directionalLight = new THREE.DirectionalLight( color, intensity );
+	directionalLight.position.set( x, y, z );
+	scene.add( directionalLight );
 
-				stats = new Stats();
-				container.appendChild( stats.dom );
+	directionalLight.castShadow = true;
 
-				//
+	var d = 1;
+	directionalLight.shadow.camera.left = -d;
+	directionalLight.shadow.camera.right = d;
+	directionalLight.shadow.camera.top = d;
+	directionalLight.shadow.camera.bottom = -d;
 
-				window.addEventListener( 'resize', onWindowResize, false );
+	directionalLight.shadow.camera.near = 1;
+	directionalLight.shadow.camera.far = 4;
 
-			}
+	directionalLight.shadow.mapSize.width = 1024;
+	directionalLight.shadow.mapSize.height = 1024;
 
-			function addShadowedLight( x, y, z, color, intensity ) {
+	directionalLight.shadow.bias = -0.005;
 
-				var directionalLight = new THREE.DirectionalLight( color, intensity );
-				directionalLight.position.set( x, y, z );
-				scene.add( directionalLight );
+}
 
-				directionalLight.castShadow = true;
+function onWindowResize() {
 
-				var d = 1;
-				directionalLight.shadow.camera.left = -d;
-				directionalLight.shadow.camera.right = d;
-				directionalLight.shadow.camera.top = d;
-				directionalLight.shadow.camera.bottom = -d;
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
 
-				directionalLight.shadow.camera.near = 1;
-				directionalLight.shadow.camera.far = 4;
+	renderer.setSize( window.innerWidth, window.innerHeight );
 
-				directionalLight.shadow.mapSize.width = 1024;
-				directionalLight.shadow.mapSize.height = 1024;
+}
 
-				directionalLight.shadow.bias = -0.005;
+function animate() {
 
-			}
+	requestAnimationFrame( animate );
+	render();
+	stats.update();
 
-			function onWindowResize() {
+}
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+var pZoomIn = 0;
+var pZoomOut = 0;
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+function render() {
+	camera.lookAt( cameraTarget );
 
-			}
+	var zoomIn, zoomOut, x, y, z, w;
+	if (typeof sensorsData !== 'undefined') {
+		zoomIn = sensorsData['volume_keys']['volumeUp'];
+		zoomOut = sensorsData['volume_keys']['volumeDown'];
 
-			function animate() {
+		x = sensorsData['sensor']['x'];
+		y = sensorsData['sensor']['y'];
+		z = sensorsData['sensor']['z'];
+		w = sensorsData['sensor']['w'];
+	}
+	else {
+		zoomIn = pZoomIn;
+		zoomOut = pZoomOut;
+		x = 0.0;
+		y = 0.0;
+		z = 0.0;
+		w = 1.0;
+	}
 
-				requestAnimationFrame( animate );
+	var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
 
-				render();
-				stats.update();
+	if(zoomIn != pZoomIn){
+		pZoomIn = zoomIn;
+		scaleVector.x = model_mesh.scale.x + 0.05;
+		scaleVector.y = model_mesh.scale.y + 0.05;
+		scaleVector.z = model_mesh.scale.z + 0.05;
+	} else if (zoomOut != pZoomOut){
+		pZoomOut = zoomOut;
+		scaleVector.x = model_mesh.scale.x - 0.05;
+		scaleVector.y = model_mesh.scale.y - 0.05;
+		scaleVector.z = model_mesh.scale.z - 0.05;
+	}
 
-			}
+	model_mesh.quaternion.copy(rotation_quaternion);
+	model_mesh.scale.set(scaleVector.x, scaleVector.y, scaleVector.z);
 
-			function render() {
-
-				var timer = Date.now() * 0.0005;
-
-				// camera.position.x = Math.cos( timer ) * 3;
-				// camera.position.z = Math.sin( timer ) * 3;
-
-				camera.lookAt( cameraTarget );
-
-				// My Edit
-
-				// var t0 = Math.cos(yaw * 0.5);
-				// var t1 = Math.sin(yaw * 0.5);
-				// var t2 = Math.cos(roll * 0.5);
-				// var t3 = Math.sin(roll * 0.5);
-				// var t4 = Math.cos(pitch * 0.5);
-				// var t5 = Math.sin(pitch * 0.5);
-
-				// My Edit
-				var t0 = Math.cos(0.0);
-				var t1 = Math.sin(0.0);
-				var t2 = Math.cos(0.0);
-				var t3 = Math.sin(0.0);
-				var t4 = Math.cos(timer);
-				var t5 = Math.sin(timer);
-
-				var w = t0 * t2 * t4 + t1 * t3 * t5;
-				var x = t0 * t3 * t4 - t1 * t2 * t5;
-				var y = t0 * t2 * t5 + t1 * t3 * t4;
-				var z = t1 * t2 * t4 - t0 * t3 * t5;
-
-				var rotation_quaternion = new THREE.Quaternion(x, y, z, w);
-				model_mesh.quaternion.copy(rotation_quaternion);
-
-				renderer.render( scene, camera );
-			}
+	renderer.render( scene, camera );
+}
 
 		</script><div><canvas width="3070" height="1572" style="width: 1535px; height: 786px;"></canvas><div style="position: fixed; top: 0px; left: 0px; cursor: pointer; opacity: 0.9; z-index: 10000;"><canvas width="160" height="96" style="width: 80px; height: 48px; display: block;"></canvas><canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas><canvas width="160" height="96" style="width: 80px; height: 48px; display: none;"></canvas></div></div>
-	
 
-</body></html>
+
+	</body></html>

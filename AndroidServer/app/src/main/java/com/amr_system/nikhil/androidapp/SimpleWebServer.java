@@ -17,11 +17,14 @@
 package com.amr_system.nikhil.androidapp;
 
 import android.content.res.AssetManager;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +51,8 @@ public class SimpleWebServer implements Runnable {
      * {@link android.content.res.AssetManager} for loading files to serve.
      */
     private final AssetManager mAssets;
+
+    private String path;
 
     /**
      * True if the server is running.
@@ -186,7 +191,9 @@ public class SimpleWebServer implements Runnable {
         InputStream input = null;
         try {
             ByteArrayOutputStream output = new ByteArrayOutputStream();
-            input = mAssets.open(fileName);
+            path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/" + fileName;
+            //input = mAssets.open(fileName);
+            input = new FileInputStream(path);
             byte[] buffer = new byte[1024];
             int size;
             while (-1 != (size = input.read(buffer))) {

@@ -29,8 +29,8 @@ function sendFile() {
 	var rawData = new ArrayBuffer();            
 	//alert(file.name);
 
-	reader.loadend = function() {
-
+	reader.onloadend = function() {
+		location.reload();
 	}
 	reader.onload = function(e) {
 		rawData = e.target.result;
@@ -39,6 +39,4 @@ function sendFile() {
 	}
 
 	reader.readAsArrayBuffer(file);
-	location.reload();
-
 }

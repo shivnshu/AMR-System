@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
             verifyStoragePermissions(this);
 
             copyFileOrDir("index.html");
+            copyFileOrDir("upload.html");
             copyFileOrDir("js");
             copyFileOrDir("models");
 

@@ -55,7 +55,7 @@ public class ExampleWebSocketServer extends WebSocketServer {
     public void onMessage(WebSocket conn, ByteBuffer bb) {
         Log.d(TAG, "abcd:  "+bb.toString());
         try {
-            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/" + "out");
+            File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/models/" + "tmp.stl");
             FileChannel channel = new FileOutputStream(file, false).getChannel();
             channel.write(bb);
             channel.close();
@@ -64,9 +64,26 @@ public class ExampleWebSocketServer extends WebSocketServer {
         }
     }
 
+    Framedata f;
     @Override
     public void onFragment( WebSocket conn, Framedata fragment ) {
         Log.d(TAG, "received fragment: " + fragment );
+        if(fragment.getOpcode().equals(Framedata.Opcode.BINARY)){
+            f = fragment;
+        } else {
+            f.append(fragment);
+        }
+        if(fragment.isFin()) {
+            try {
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/models/" + "tmp.stl");
+                FileChannel channel = new FileOutputStream(file, false).getChannel();
+                channel.write(f.getPayloadData());
+                channel.close();
+            } catch (IOException e) {
+                Log.e(TAG, "I/O Error: " + e.getMessage());
+            }
+            // Log.d(TAG, "Full fragment: " + f.getPayloadData());
+        }
     }
 
     @Override

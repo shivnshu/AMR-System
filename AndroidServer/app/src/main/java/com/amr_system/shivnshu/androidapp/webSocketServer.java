@@ -52,7 +52,7 @@ public class webSocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket conn, ByteBuffer bb) {
-        Log.d(TAG, "abcd:  "+bb.toString());
+        Log.d(TAG, "Uploading File:  "+bb.toString());
         try {
             File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/AMR-System/models/" + "tmp.stl");
             FileChannel channel = new FileOutputStream(file, false).getChannel();

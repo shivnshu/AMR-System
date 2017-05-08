@@ -71,13 +71,6 @@ public class MainActivity extends AppCompatActivity {
 
     private SimpleWebServer mWebServer;
 
-    // Storage Permissions
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -109,79 +102,9 @@ public class MainActivity extends AppCompatActivity {
         UserMsg.setText(getString(R.string.user_msg)+getIpAddress()+":"+String.valueOf(webPort));
         // UserMsg.setText(getString(R.string.user_msg_off));
         updateServerState(getString(R.string.server_status_off));
-        verifyStoragePermissions(this);
-
-        copyFileOrDir("index.html");
-        copyFileOrDir("js");
-        copyFileOrDir("css");
-        copyFileOrDir("models");
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Log.d(TAG, "TAG string is " + TAG + "\n");
-    }
-
-    private static void verifyStoragePermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_STORAGE,
-                    REQUEST_EXTERNAL_STORAGE
-            );
-        }
-    }
-
-    private void copyFileOrDir(String path) {
-        AssetManager assetManager = this.getAssets();
-        String assets[] = null;
-        try {
-            assets = assetManager.list(path);
-            String fullPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/AMR-System/";
-            File dir = new File(fullPath);
-            if (!dir.exists())
-                dir.mkdir();
-            if (assets.length == 0) {
-                copyFile(path);
-            } else {
-                fullPath = Environment.getExternalStorageDirectory().getAbsolutePath() +"/AMR-System/"+ path;
-                dir = new File(fullPath);
-                if (!dir.exists())
-                    dir.mkdir();
-                for (int i = 0; i < assets.length; ++i) {
-                    copyFileOrDir(path + "/" + assets[i]);
-                }
-            }
-        } catch (IOException ex) {
-            Log.e(TAG, "I/O Exception", ex);
-        }
-    }
-
-    private void copyFile(String filename) {
-        AssetManager assetManager = this.getAssets();
-
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            in = assetManager.open(filename);
-            String newFileName = Environment.getExternalStorageDirectory().getAbsolutePath() +"/AMR-System/"+ filename;
-            out = new FileOutputStream(newFileName);
-
-            byte[] buffer = new byte[1024];
-            int read;
-            while ((read = in.read(buffer)) != -1) {
-                out.write(buffer, 0, read);
-            }
-            in.close();
-            in = null;
-            out.flush();
-            out.close();
-            out = null;
-        } catch (Exception e) {
-            Log.e(TAG, "Error: "+e.getMessage());
-        }
-
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {

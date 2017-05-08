@@ -1,5 +1,5 @@
-# AMR-System
-_An android app to fetch and fuse sensor data from android phones to detect its motion and use it to control the CAD model displayed in the WebPage at the specified URL._
+# AMR System
+_An android app to fetch and fuse sensor data from an android phone to detect its motion and use it to control the CAD model displayed in the WebPage at the specified URL._
 
 ### Team members
 * [Dipendra Singh](https://github.com/sdipendra)
@@ -13,3 +13,11 @@ _An android app to fetch and fuse sensor data from android phones to detect its 
 4. Using upload button at bottom-right, we can also upload a CAD model (stl file format).
 
 **Note:** Since, this app uses [TYPE_ROTATION_VECTOR](https://developer.android.com/reference/android/hardware/Sensor.html#TYPE_ROTATION_VECTOR) in-build sensor, it may crash on devices that doesn't have it.
+
+## Screenshots
+![](Screenshots/3.png)
+![](Screenshots/4.png)
+![](Screenshots/5.png)
+
+## License
+See [LICENSE.txt](https://github.com/shivnshu/AMR-System/blob/master/LICENSE.txt) for more information

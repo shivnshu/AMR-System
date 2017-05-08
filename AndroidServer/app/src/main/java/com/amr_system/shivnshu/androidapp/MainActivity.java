@@ -1,19 +1,9 @@
 package com.amr_system.shivnshu.androidapp;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 
-
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -23,7 +13,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -363,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                 int port = 8887; // 843 flash policy port
                 webSocketServer s = new webSocketServer( new InetSocketAddress("0.0.0.0", port) );
                 s.start();
-                Log.d(TAG, "ChatServer started on port: " + s.getPort() );
+                Log.d(TAG, "WebSocketServer started on port: " + s.getPort() );
                 String in;
                 while ( true ) {
                     JSONObject jsonObject = new JSONObject();

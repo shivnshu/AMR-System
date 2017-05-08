@@ -56,7 +56,7 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
-    private static void verifyStoragePermissions(Activity activity) {
+    private void verifyStoragePermissions(Activity activity) {
         // Check if we have write permission
         int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
@@ -66,6 +66,15 @@ public class SplashActivity extends AppCompatActivity {
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
+        } else {
+            copyFileOrDir("index.html");
+            copyFileOrDir("js");
+            copyFileOrDir("css");
+            copyFileOrDir("models");
+            Log.d(TAG, "Already have Permission!\n");
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
